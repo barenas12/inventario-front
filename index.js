@@ -18,6 +18,7 @@ function cargarImplementos() {
                 fila.insertCell().textContent = implemento.condicion;
                 fila.insertCell().textContent = implemento.pertenencia;
                 fila.insertCell().textContent = implemento.propietario;
+                fila.insertCell().textContent = implemento.responsable;
                 fila.insertCell().textContent = implemento.cantidad;
                 fila.insertCell().textContent = Number(implemento.valor).toLocaleString('es-CO');
                 const fecha = new Date(implemento.fecha);
@@ -40,7 +41,7 @@ function cargarImplementos() {
                     const id = dataset.target.dataset.id;
                     console.log("📌 Guardando id en sessionStorage:", id);
                     sessionStorage.setItem('id', id);
-                    window.location.href = `editar_frm.html`;
+                    window.location.href = `editar_Implemento.html`;
                 };
                 fila.insertCell().appendChild(btnEditar);
             });

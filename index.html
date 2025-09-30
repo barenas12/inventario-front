@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
@@ -43,7 +44,7 @@
                     <img src="icons/library.svg" alt="library">
                     <span>Inventario</span>
                 </a>
-                <a href="crear_Formulario.html">
+                <a href="crear_Implemento.html">
                     <img src="icons/file.svg" alt="add_implement">
                     <span>Añadir Implemento</span>
                 </a>
@@ -67,8 +68,9 @@
                         <option value="4">Condición</option>
                         <option value="5">Pertenencia</option>
                         <option value="6">Propietario</option>
-                        <option value="10">Sede</option>
-                        <option value="12">Estado</option>
+                        <option value="7">Responsable</option>
+                        <option value="11">Sede</option>
+                        <option value="13">Estado</option>
                     </select>
                 </div>
 
@@ -95,6 +97,7 @@
                         <th>Condición</th>
                         <th>Pertenencia</th>
                         <th>Propietario</th>
+                        <th>Responsable</th>
                         <th>Cantidad</th>
                         <th>Valor</th>
                         <th>Fecha</th>
@@ -111,7 +114,20 @@
                 <div>
                     <span id="totalRegistros" class="fw-bold"></span>
                 </div>
+                <div>
+                    <label for="registrosPorPagina" class="form-label">Mostrar:</label>
+                    <select id="registrosPorPagina" class="form-select d-inline-block w-auto">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="12">12</option>
+                        <option value="20">20</option>
+                    </select>
+                    <span> Registros por página</span>
+                </div>
             </div>
+            <nav>
+                <ul class="pagination" id="paginacion"></ul>
+            </nav>
         </section>
     </main>
 
@@ -143,7 +159,7 @@
                 let mostrar = false;
 
                 // Si la columna es Estado (12) → coincidencia exacta
-                if (columna == 12) {
+                if (columna == 13) {
                     mostrar = (texto === valor);
                 } else {
                     // Para las demás columnas → coincidencia parcial
@@ -164,6 +180,35 @@
             filas[i].style.display = ""; // muestra todas otra vez
         }
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const tabla = document.querySelector("table tbody"); // cuerpo de la tabla
+    const filas = tabla.querySelectorAll("tr"); // todas las filas
+    const selectRegistros = document.querySelector("select"); // tu <select> de "Registros por página"
+    
+    let paginaActual = 1;
+    let registrosPorPagina = parseInt(selectRegistros.value);
+
+    function mostrarPagina(pagina) {
+        const inicio = (pagina - 1) * registrosPorPagina;
+        const fin = inicio + registrosPorPagina;
+
+        filas.forEach((fila, index) => {
+            fila.style.display = (index >= inicio && index < fin) ? "" : "none";
+        });
+    }
+
+    // cuando cambias la cantidad en el select
+    selectRegistros.addEventListener("change", () => {
+        registrosPorPagina = parseInt(selectRegistros.value);
+        paginaActual = 1;
+        mostrarPagina(paginaActual);
+    });
+
+    // inicia mostrando la primera página
+    mostrarPagina(paginaActual);
+});
+    
 </script>
 
 <style>
@@ -207,8 +252,8 @@
 
     main {
         margin-left: 2.6rem;
-        margin-right: -1.2rem;
-        padding: 1rem;
+        margin-right: -1.5rem;
+        padding: 0.8rem;
         padding-top: 70px;
         transition: margin-left 0.5s ease, margin-right 0.3s ease;
     }

@@ -38,7 +38,7 @@
                     <img src="icons/library.svg" alt="library">
                     <span>Inventario</span>
                 </a>
-                <a href="crear_Formulario.html">
+                <a href="crear_Implemento.html">
                     <img src="icons/file.svg" alt="add_implement">
                     <span>Añadir Implemento</span>
                 </a>
@@ -124,10 +124,11 @@
 
                 <div class="row justify-content-md-center">
                     <div class="form-group col-md-2">
-                        <label for="Descripción">Descripción</label>
+                        <label for="Responsable">Responsable</label>
                         <div>
-                            <input onchange="activarDescripcion()" class="form-control" name="descripcion"
-                                placeholder="Añade la descripción" id="descripcion">
+                            <select name="responsable" class="form-select" arial-label="Default select example"
+                                id="responsable">
+                            </select>
                         </div>
                     </div>
 
@@ -152,12 +153,6 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group col-md-2">
-                        <label for="valor">Valor</label>
-                        <div>
-                            <input onchange="activarValor()" class="form-control" type="number" name="valor" id="valor">
-                        </div>
-                    </div>
 
                     <div class="form-group col-md-2">
                         <label for="fecha">Fecha</label>
@@ -166,6 +161,25 @@
                         </div>
                     </div>
 
+                    <div class="form-group col-md-2">
+                        <label for="valor">Valor</label>
+                        <div>
+                            <input onchange="activarValor()" class="form-control" type="number" name="valor" id="valor">
+                        </div>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="Descripción">Descripción</label>
+                        <div>
+                            <input onchange="activarDescripcion()" class="form-control" name="descripcion"
+                                placeholder="Añade la descripción" id="descripcion">
+                        </div>
+                    </div>
+
+                </div>
+
+                <br>
+
+                <div class="row justify-content-md-center">
                     <div class="form-group col-md-2">
                         <label for="estado">Estado</label>
                         <div>
@@ -179,6 +193,7 @@
                 </div>
 
                 <br>
+
 
                 <label for="botones">
                     <div>
@@ -203,9 +218,12 @@
         const id_implemento = document.querySelector('#id_implemento');
         const sede = document.querySelector('#sede');
         const descripcion = document.querySelector('#descripcion');
+        const responsable = document.querySelector('#responsable');
 
         // Espera a que recorrerDepartamentos() se complete
         await recorrerDepartamentos();
+        await recorrerResponsable();
+
 
         traerInformacion().then(async (informacion) => {
             console.log(informacion);
@@ -234,10 +252,11 @@
             id_implemento.value = informacion.id_implemento;
             descripcion.value = informacion.descripcion;
             sede.value = informacion.sede;
+            responsable.value = informacion.responsable;
             console.log("Información de departamentos cargada correctamente.");
             console.log(informacion.sede);
             console.log(informacion.departamento);
-            console.log(informacion.propietario);
+            console.log(informacion.responsable);
         }).catch(error => {
             console.error("Error al cargar la información de departamentos:", error);
         });
@@ -251,32 +270,65 @@
     // Captura la información del nombre del implemento en el formulario
     function activarNombre() {
         const implemento = document.querySelector('#implemento_name');
+        if (implemento.value == "") {
+            alert("Por favor, seleccione un implemento");
+            return null;
+        }
         return implemento.value;
     }
     // Captura la información del nombre de la categoria en el formulario
     function activarCategoria() {
         const categoria = document.querySelector('#categoria');
+        if (categoria.value == "") {
+            alert("Por favor, seleccione una categoria");
+            return null;
+        }
         return categoria.value;
     }
     // Captura la información del nombre del departamento en el formulario
     function activarDepartamento() {
         const inventario = document.querySelector('#departamento');
+        if (inventario.value == "") {
+            alert("Por favor, seleccione un departamento");
+            return null;
+        }
         return inventario.value;
     }
     // Captura la información del nombre de la condición en el formulario
     function activarCondicion() {
         const inventario = document.querySelector('#condicion');
+        if (inventario.value == "") {
+            alert("Por favor, seleccione el estado del implemento");
+            return null;
+        }
         return inventario.value;
     }
     // Captura la información del nombre del propietario en el formulario
     function activarPertenencia() {
         const inventario = document.querySelector('#pertenencia');
+        if (inventario.value == "") {
+            alert("Por favor, seleccione la pertenencia del implemento");
+            return null;
+        }
         return inventario.value;
     }
 
     function activarPropietario() {
         const inventario = document.querySelector('#propietario');
+        if (inventario.value == "") {
+            alert("Por favor, seleccione el propietario del implemento");
+            return null;
+        }
         return inventario.value;
+    }
+
+    function activarResponsable() {
+        const responsable = document.querySelector('#responsable');
+        if (responsable.value == "") {
+            alert("Por favor, seleccione un responsable")
+            return null;
+        }
+        return responsable.value;
     }
 
 
@@ -300,16 +352,30 @@
     // Captura la información del nombre de la fecha en el formulario
     function activarFecha() {
         const inventario = document.querySelector('#fecha');
+        if (fecha.value == "") {
+            alert("Por favor, seleccione una fecha");
+            return null;
+        }
+        console.log(inventario.value);
         return inventario.value;
     }
 
     function activarEstado() {
         const estado = document.querySelector('#estado');
+        if (estado.value == "") {
+            alert("Por favor, seleccione una sede");
+            return null;
+        }
+        console.log(estado.value);
         return estado.value;
     }
 
     function activarSede() {
         const inventario = document.querySelector('#sede');
+        if (inventario.value == "") {
+            alert("Por favor, seleccione una sede");
+            return null;
+        }
         console.log(inventario.value);
         return inventario.value;
     }
@@ -317,7 +383,6 @@
     function activarDescripcion() {
         const inventario = document.querySelector('#descripcion');
         console.log(typeof inventario.value);
-
         return inventario.value;
     }
 
@@ -337,9 +402,13 @@
         const propietario = activarPropietario();
         const valor = activarValor();
         const fecha = activarFecha();
-        const estado = activarEstado();
-        const descripcion = activarDescripcion();
         const sede = activarSede();
+        const descripcion = activarDescripcion();
+        const responsable = activarResponsable();
+
+        if (!nombre || !categoria || !departamento || !condicion || !pertenencia || !propietario || !valor || !fecha || !sede || !responsable) {
+            return;
+        }
 
         const datos = {
             nombre,
@@ -350,12 +419,12 @@
             propietario,
             valor,
             fecha,
-            estado,
             sede,
-            descripcion
+            descripcion,
+            responsable
         };
+        console.log(datos);
         actualizarImplemento(datos);
-        console.log("datos enviados a bk" + datos);
         window.location.href = `index.html`;
     })
 
@@ -416,6 +485,30 @@
                 .catch(function (error) {
                     console.error("¡Error!", error);
                     (reject.error);
+                });
+        });
+    }
+
+    function recorrerResponsable() {
+        return new Promise((resolve, reject) => {
+            const select = document.querySelector("#responsable");
+            const url = 'http://localhost:3000/api/inventario/responsable';
+            fetch(url, {
+                method: 'GET',
+            })
+                .then(res => res.json())
+                .then(lista_de_responsable => {
+                    for (let responsable of lista_de_responsable) {
+                        let nuevaOpcion = document.createElement("option");
+                        nuevaOpcion.value = responsable.id;
+                        nuevaOpcion.text = responsable.nombre;
+                        select.add(nuevaOpcion);
+                    }
+                    resolve(); // Resolvemos la promesa al terminar
+                })
+                .catch(error => {
+                    console.error("¡Error!", error);
+                    reject(error); // Rechazamos la promesa en caso de error
                 });
         });
     }
@@ -491,14 +584,14 @@
     }
 
     const menu = document.getElementById("menu");
-const sidebar = document.getElementById("sidebar");
-const main = document.getElementById("main")
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main")
 
-menu.addEventListener('click', () => {
-    sidebar.classList.toggle('menu-toggle');
-    menu.classList.toggle('menu-toggle');
-    main.classList.toggle('menu-toggle');
-})
+    menu.addEventListener('click', () => {
+        sidebar.classList.toggle('menu-toggle');
+        menu.classList.toggle('menu-toggle');
+        main.classList.toggle('menu-toggle');
+    })
 </script>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
@@ -570,7 +663,8 @@ menu.addEventListener('click', () => {
         /* opcional, para mantener altura */
         visibility: hidden;
     }
-main {
+
+    main {
         margin-left: 2.6rem;
         margin-right: -1.2rem;
         padding: 1rem;
@@ -776,4 +870,5 @@ main {
         }
     }
 </style>
+
 </html>

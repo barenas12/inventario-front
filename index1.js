@@ -41,6 +41,15 @@ function activarDepartamento() {
     }
     return inventario.value;
 }
+
+function activarResponsable(){
+    const responsable = document.querySelector('#responsable');
+    if(responsable.value == ""){
+        alert("Por favor, seleccione un responsable")
+        return null;
+    }
+    return responsable.value;
+}
 // Captura la información del nombre de la condición en el formulario
 function activarCondicion() {
     const inventario = document.querySelector('#condicion');
@@ -99,6 +108,10 @@ function activarFecha() {
 
 function activarSede() {
     const inventario = document.querySelector('#sede');
+    if(inventario.value ==""){
+        alert("Por favor, seleccione una sede");
+        return null;
+    }
     console.log(inventario.value);
     return inventario.value;
 }
@@ -131,8 +144,9 @@ form.addEventListener('submit', async function (event) {
     const fecha = activarFecha();
     const sede = activarSede();
     const descripcion = activarDescripcion();
+    const responsable = activarResponsable();
 
-    if (!nombre || !categoria || !departamento || !condicion || !pertenencia || !propietario || !valor || !fecha || !sede) {
+    if (!nombre || !categoria || !departamento || !condicion || !pertenencia || !propietario || !valor || !fecha || !sede || !responsable) {
         return;
     }
 
@@ -146,7 +160,8 @@ form.addEventListener('submit', async function (event) {
         valor,
         fecha,
         sede,
-        descripcion
+        descripcion,
+        responsable
     };
     console.log(datos);
     enviarAlBackend(datos);
@@ -215,6 +230,27 @@ function recorrerDepartamentos() {
                 let nuevaOpcion = document.createElement("option");
                 nuevaOpcion.value = departamento.id;
                 nuevaOpcion.text = departamento.nombre;
+                select.add(nuevaOpcion);
+            }
+        })
+        .catch(function (error) {
+            console.error("¡Error!", error);
+        });
+}
+
+function recorrerResponsable() {
+    const select = document.querySelector("#responsable");
+    const url = 'http://localhost:3000/api/inventario/responsable';
+    select.innerHTML = '<option value="" disabled selected>Seleccione el responsable</option>';
+    fetch(url, {
+        method: 'GET',
+    })
+        .then(res => res.json())
+        .then(lista_de_responsable => {
+            for (let responsable of lista_de_responsable) {
+                let nuevaOpcion = document.createElement("option");
+                nuevaOpcion.value = responsable.id;
+                nuevaOpcion.text = responsable.nombre;
                 select.add(nuevaOpcion);
             }
         })
