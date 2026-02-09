@@ -1,11 +1,50 @@
 //Inserta la información en la tabla del front
 const tabla = document.querySelector('#tabla #tabla-body');
 
+// ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
+async function fetchConToken(url, opciones = {}) {
+  const token = localStorage.getItem('token');
 
-function cargarImplementos() {
-    fetch('http://localhost:3000/api/inventario/implemento')
-        .then(response => response.json())
-        .then(data => {
+  if (!token) {
+    console.log('❌ No hay token, redirigiendo a login');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+    ...opciones.headers
+  };
+
+  try {
+    const response = await fetch(url, {
+      ...opciones,
+      headers
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      console.log('❌ Token expirado o inválido');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('role');
+      alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    return response;
+  } catch (error) {
+    console.error('❌ Error en request:', error);
+    throw error;
+  }
+}
+
+async function cargarImplementos() {
+    const response = await fetchConToken('http://localhost:3000/api/inventario/implemento', {
+        method: 'GET'
+    });
+    const data = await response.json();
             const tabla = document.querySelector('#tabla-body');
             tabla.innerHTML = '';
 
@@ -45,11 +84,8 @@ function cargarImplementos() {
                 };
                 fila.insertCell().appendChild(btnEditar);
             });
-        })
-        .catch(error => {
-            console.error('❌ Error al cargar implementos:', error);
-        })
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     cargarImplementos();
 });
@@ -62,9 +98,10 @@ function activarExportar() {
         return;
     }
 
-    btnExportar.addEventListener("click", () => {
+    btnExportar.addEventListener("click", async () => {
         console.log("📌 Exportando inventario...");
-        window.location.href = "http://localhost:3000/api/exportar";
+        const token = localStorage.getItem('token');
+        window.location.href = `http://localhost:3000/api/exportar?token=${token}`;
     });
 }
 

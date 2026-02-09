@@ -8,6 +8,45 @@ menu.addEventListener('click', () => {
 
 })
 
+// ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
+async function fetchConToken(url, opciones = {}) {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    console.log('❌ No hay token, redirigiendo a login');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+    ...opciones.headers
+  };
+
+  try {
+    const response = await fetch(url, {
+      ...opciones,
+      headers
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      console.log('❌ Token expirado o inválido');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('role');
+      alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    return response;
+  } catch (error) {
+    console.error('❌ Error en request:', error);
+    throw error;
+  }
+}
+
 // Obtener la fecha actual en formato YYYY-MM-DD
 const hoy = new Date().toISOString().split("T")[0];
 
@@ -179,11 +218,8 @@ function limpiarFormulario() {
 }
 
 function enviarAlBackend(datos) {
-    fetch('http://localhost:3000/api/inventario/implemento', {
+    fetchConToken('http://localhost:3000/api/inventario/implemento', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
         body: JSON.stringify(datos)
     })
         .then(res => res.json())
@@ -201,7 +237,7 @@ function nombre() {
     const categoria = document.querySelector("#categoria").value;
     const url = `http://localhost:3000/api/inventario/cat_implemento/${encodeURIComponent(categoria)}`;
     name.innerHTML = '<option value="" disabled selected>Seleccione el implemento</option>';
-    fetch(url, {
+    fetchConToken(url, {
         method: 'GET',
     })
         .then(res => res.json())
@@ -221,7 +257,7 @@ function nombre() {
 function recorrerDepartamentos() {
     const select = document.querySelector("#departamento");
     const url = 'http://localhost:3000/api/inventario/departamento';
-    fetch(url, {
+    fetchConToken(url, {
         method: 'GET',
     })
         .then(res => res.json())
@@ -242,7 +278,7 @@ function recorrerResponsable() {
     const select = document.querySelector("#responsable");
     const url = 'http://localhost:3000/api/inventario/responsable';
     select.innerHTML = '<option value="" disabled selected>Seleccione el responsable</option>';
-    fetch(url, {
+    fetchConToken(url, {
         method: 'GET',
     })
         .then(res => res.json())
@@ -262,7 +298,7 @@ function recorrerResponsable() {
 function recorrerImplementos() {
     const select = document.querySelector("#categoria");
     const url = 'http://localhost:3000/api/inventario/cat_implemento';
-    fetch(url, {
+    fetchConToken(url, {
         method: 'GET',
     })
         .then(res => res.json())

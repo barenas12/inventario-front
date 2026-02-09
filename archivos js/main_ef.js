@@ -3,6 +3,46 @@ function activarNombre() {
     const implemento = document.querySelector('#implemento_name');
     return implemento.value;
 }
+
+// ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
+async function fetchConToken(url, opciones = {}) {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    console.log('❌ No hay token, redirigiendo a login');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+    ...opciones.headers
+  };
+
+  try {
+    const response = await fetch(url, {
+      ...opciones,
+      headers
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      console.log('❌ Token expirado o inválido');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('role');
+      alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    return response;
+  } catch (error) {
+    console.error('❌ Error en request:', error);
+    throw error;
+  }
+}
+
 // Captura la información del nombre de la categoria en el formulario
 function activarCategoria() {
     const categoria = document.querySelector('#categoria');
@@ -98,11 +138,8 @@ function limpiarFormulario() {
 }
 
 function enviarAlBackend(datos) {
-    fetch('http://localhost:3000/api/inventario/implemento', {
+    fetchConToken('http://localhost:3000/api/inventario/implemento', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
         body: JSON.stringify(datos)
     })
         .then(res => res.json())
@@ -131,7 +168,7 @@ async function nombre(selectedValue = null) {
     name.innerHTML = "";
     name.innerHTML = '<option value="" disabled selected>Seleccione el implemento</option>';
     try {
-        const res = await fetch(url, { method: 'GET' });
+        const res = await fetchConToken(url, { method: 'GET' });
         const lista_cat = await res.json();
         for (let implemento of lista_cat) {
             let nuevaOpcion = document.createElement("option");
@@ -153,7 +190,7 @@ function recorrerDepartamentos() {
     return new Promise((resolve, reject) => {
         const select = document.querySelector("#departamento");
         const url = 'http://localhost:3000/api/inventario/departamento';
-        fetch(url, {
+        fetchConToken(url, {
             method: 'GET',
         })
             .then(res => res.json())
@@ -176,7 +213,7 @@ function recorrerDepartamentos() {
 function recorrerImplementos() {
     const select = document.querySelector("#categoria");
     const url = 'http://localhost:3000/api/inventario/cat_implemento';
-    fetch(url, {
+    fetchConToken(url, {
         method: 'GET',
     })
         .then(res => res.json())
@@ -197,7 +234,7 @@ function traerInformacion() {
     return new Promise((resolve, reject) => {
         const id = sessionStorage.getItem('id');
         const url = 'http://localhost:3000/api/inventario/implemento/' + id;
-        fetch(url, {
+        fetchConToken(url, {
             method: 'GET',
         })
             .then(res => {
@@ -223,11 +260,8 @@ function traerInformacion() {
 
 function actualizarImplemento(datos) {
     const id = sessionStorage.getItem('id');
-    fetch(`http://localhost:3000/api/inventario/implemento/` + id, {
+    fetchConToken(`http://localhost:3000/api/inventario/implemento/` + id, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
         body: JSON.stringify(datos)
     })
         .then(res => res.json())
