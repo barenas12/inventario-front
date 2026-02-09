@@ -43,7 +43,15 @@
                 </a>
                 <a href="#">
                     <img src="icons/profile.svg" alt="profile">
-                    <span>Usuarios</span>
+                    <span>Agregar Responsable</span>
+                </a>
+                <a href="#">
+                    <img src="icons/departament.svg" alt="settings">
+                    <span>Agregar Departamento</span>
+                </a>
+                <a href="#">
+                    <img src="icons/implement.svg" alt="settings">
+                    <span>Agregar Implemento</span>
                 </a>
             </ul>
         </nav>
@@ -52,6 +60,13 @@
         <section class="name1">
             Editando Implemento
         </section>
+        <div class="col-right d-flex gap-2 justify-content-end">
+            <label class="form-label fw-bold d-block">&nbsp;</label>
+            <a href="index.html">
+                <button class="btn btn-success">Inventario</button>
+            </a>
+        </div>
+        <br>
         <section>
             <form class="form-select" size="3" aria-label="Size 3 select example" id="formulario">
                 <div class="row justify-content-md-center">
@@ -190,15 +205,15 @@
                         </div>
                     </div>
                 </div>
-
-                <br>
-
-
-                <label for="botones">
-                    <div>
-                        <button type='update' class="btn btn-primary" name="submit" id="btnUpdate">Actualizar</button>
+                <div class="row justify-content-md-center">
+                    <div class="form-group col-md-2 just">
+                        <label for="botones"></label>
+                        <div>
+                            <button type='uptade' class="btn btn-primary" name="submit"
+                                id="btnUpdate">Actualizar</button>
+                        </div>
                     </div>
-                </label>
+                </div>
             </form>
         </section>
     </main>
@@ -254,6 +269,7 @@
             responsable.value = informacion.responsable;
             console.log("Información de departamentos cargada correctamente.");
             console.log(informacion.sede);
+            console.log(informacion.estado);
             console.log(informacion.departamento);
             console.log(informacion.responsable);
         }).catch(error => {
@@ -362,7 +378,7 @@
     function activarEstado() {
         const estado = document.querySelector('#estado');
         if (estado.value == "") {
-            alert("Por favor, seleccione una sede");
+            alert("Por favor, seleccione una estado");
             return null;
         }
         console.log(estado.value);
@@ -404,8 +420,9 @@
         const sede = activarSede();
         const descripcion = activarDescripcion();
         const responsable = activarResponsable();
+        const estado = activarEstado();
 
-        if (!nombre || !categoria || !departamento || !condicion || !pertenencia || !propietario || !valor || !fecha || !sede || !responsable) {
+        if (!nombre || !categoria || !departamento || !condicion || !estado || !pertenencia || !propietario || !valor || !fecha || !sede || !responsable) {
             return;
         }
 
@@ -420,7 +437,8 @@
             fecha,
             sede,
             descripcion,
-            responsable
+            responsable,
+            estado
         };
         console.log(datos);
         actualizarImplemento(datos);

@@ -12,7 +12,7 @@
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 </head>
 
-<body onload="recorrerDepartamentos()">
+<body onload="recorrerDepartamentos(); recorrerResponsable()">
     <header>
         <div class="left">
             <div class="menu-container">
@@ -41,11 +41,19 @@
                 </a>
                 <a href="#" class="selected">
                     <img src="icons/file.svg" alt="add_implement">
-                    <span>Añadir Implemento</span>
+                    <span>Insertar Implemento</span>
                 </a>
                 <a href="#">
                     <img src="icons/profile.svg" alt="profile">
-                    <span>Usuarios</span>
+                    <span>Agregar Responsable</span>
+                </a>
+                <a href="#">
+                    <img src="icons/departament.svg" alt="settings">
+                    <span>Agregar Departamento</span>
+                </a>
+                <a href="#">
+                    <img src="icons/implement.svg" alt="settings">
+                    <span>Agregar Implemento</span>
                 </a>
             </ul>
         </nav>
@@ -55,6 +63,13 @@
         <section class="name1">
             Agregando Implemento
         </section>
+        <div class="col-right d-flex gap-2 justify-content-end">
+            <label class="form-label fw-bold d-block">&nbsp;</label>
+            <a href="index.html">
+                <button class="btn btn-success">Inventario</button>
+            </a>
+        </div>
+        <br>
         <section>
             <form class="form-select" size="3" aria-label="Size 3 select example" id="formulario">
                 <div class="row justify-content-md-center">
@@ -121,13 +136,13 @@
 
                 <div class="row justify-content-md-center">
                     <div class="form-group col-md-2">
-                        <label for="Descripción">Descripción</label>
+                        <label for="Responsable">Responsable</label>
                         <div>
-                            <input onchange="activarDescripcion()" class="form-control" name="descripcion"
-                                placeholder="Añade la descripción" id="descripcion">
+                            <select onchange="" class="form-select" arial-label="Default select example"
+                                id="responsable">
+                            </select>
                         </div>
                     </div>
-
                     <div class="form-group col-md-2">
                         <label for="Pertenencia">Propiedad </label>
                         <div>
@@ -151,15 +166,6 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="form-group col-md-2">
-                        <label for="valor">Valor</label>
-                        <div>
-                            <input onchange="activarValor()" class="form-control" type="number" name="valor"
-                                placeholder="Ingrese el valor" id="valor">
-                        </div>
-                    </div>
-
                     <div class="form-group col-md-2">
                         <label for="fecha">Fecha</label>
                         <div>
@@ -169,7 +175,25 @@
 
                     </div>
 
+                    <div class="form-group col-md-2">
+                        <label for="valor">Valor</label>
+                        <div>
+                            <input onchange="activarValor()" class="form-control" type="number" name="valor"
+                                placeholder="Ingrese el valor" id="valor">
+                        </div>
+                    </div>
 
+
+                </div>
+                <br>
+                <div class="row justify-content-md-center">
+                    <div class="form-group col-md-2">
+                        <label for="Descripción">Descripción</label>
+                        <div>
+                            <input onchange="activarDescripcion()" class="form-control" name="descripcion"
+                                placeholder="Añade la descripción" id="descripcion">
+                        </div>
+                    </div>
                 </div>
                 <div class="row justify-content-md-center">
                     <div class="form-group col-md-2 just">
@@ -379,7 +403,7 @@
     }
 
     .sidebar.menu-toggle {
-        width: 15rem;
+        width: 16rem;
         margin-right: 16rem;
     }
 

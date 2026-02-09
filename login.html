@@ -1,44 +1,30 @@
+<!-- login.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <script src='main.js'></script>
-  <title>Login</title>
+  <script src="main1.js" defer></script>
 </head>
 
 <body>
-
-  <!-- Fondo independiente con opacidad -->
   <div class="fondo"></div>
-
-  <form>
-
+  <form id="loginForm">
     <h3 class="titulo">Login</h3>
-
     <div class="mb-3 text-start">
       <label class="form-label">Usuario</label>
-      <div>
-        <input onchange="tomar_usuario()" class="form-control" name="user" placeholder="Ingrese su Usuario" id="user">
-      </div>
+      <input class="form-control" id="username" placeholder="Ingrese su Usuario">
     </div>
-
     <div class="mb-3 text-start">
-      <label for="password" class="form-label">Contraseña</label>
-      <div>
-        <input type="password" onchange="tomar_password()" class="form-control" name="password"
-          placeholder="Ingrese su Contraseña" id="password">
-      </div>
-
+      <label class="form-label">Contraseña</label>
+      <input type="password" class="form-control" id="password" placeholder="Ingrese su Contraseña">
     </div>
-
-    <button type="submit" onclick="comprobar_credenciales()" class="btn btn-primary w-100">Ingresar</button>
-
+    <button type="submit" class="btn btn-primary w-100" id="loginBtn">Ingresar</button>
   </form>
-
+  <pre id="status"></pre>
 </body>
 
 </html>
