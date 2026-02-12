@@ -274,5 +274,4 @@ function actualizarImplemento(datos) {
             console.error('❌ Error al enviar al backend:', error);
             alert('Error al guardar en la base de datos');
         });
-    alert('✅ Actualizado Correctamente');
 }

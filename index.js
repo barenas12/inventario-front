@@ -82,8 +82,17 @@ async function cargarImplementos() {
                     sessionStorage.setItem('id', id);
                     window.location.href = `editar_Implemento.html`;
                 };
-                fila.insertCell().appendChild(btnEditar);
-            });
+                  fila.insertCell().appendChild(btnEditar);
+                });
+
+                // actualizar contador total de registros
+                const totalEl = document.getElementById('totalRegistros');
+                if (totalEl) totalEl.textContent = `Total: ${data.length}`;
+
+                // inicializar/actualizar paginación ahora que la tabla tiene filas
+                if (typeof window.initPagination === 'function') {
+                  window.initPagination();
+                }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

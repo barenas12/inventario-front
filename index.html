@@ -131,6 +131,7 @@
                         <option value="10" selected>10</option>
                         <option value="12">12</option>
                         <option value="20">20</option>
+                        <option value="0">Todos</option>
                     </select>
                     <span> Registros por página</span>
                 </div>
@@ -191,33 +192,82 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    // Inicializa la paginación; se llama después de cargar los datos en la tabla
+    window.initPagination = function () {
         const tabla = document.querySelector("table tbody"); // cuerpo de la tabla
-        const filas = tabla.querySelectorAll("tr"); // todas las filas
-        const selectRegistros = document.querySelector("select"); // tu <select> de "Registros por página"
+        let filas = tabla.querySelectorAll("tr"); // todas las filas actuales
+        const selectRegistros = document.getElementById("registrosPorPagina");
+        const paginacionEl = document.getElementById('paginacion');
 
         let paginaActual = 1;
-        let registrosPorPagina = parseInt(selectRegistros.value);
+
+        function getRegistrosPorPagina() {
+            const v = parseInt(selectRegistros.value, 10);
+            if (isNaN(v) || v <= 0) return filas.length; // 0 o invalid => mostrar todo
+            return v;
+        }
 
         function mostrarPagina(pagina) {
+            filas = tabla.querySelectorAll("tr");
+            const total = filas.length;
+            const registrosPorPagina = getRegistrosPorPagina();
             const inicio = (pagina - 1) * registrosPorPagina;
             const fin = inicio + registrosPorPagina;
 
             filas.forEach((fila, index) => {
                 fila.style.display = (index >= inicio && index < fin) ? "" : "none";
             });
+
+            renderPaginacion(total, registrosPorPagina);
+        }
+
+        function renderPaginacion(totalRegistros, registrosPorPagina) {
+            paginacionEl.innerHTML = '';
+            const totalPaginas = Math.max(1, Math.ceil(totalRegistros / registrosPorPagina));
+
+            function crearLi(text, disabled, active, onClick) {
+                const li = document.createElement('li');
+                li.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+                const a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = text;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (!disabled) onClick();
+                });
+                li.appendChild(a);
+                return li;
+            }
+
+            // Prev
+            paginacionEl.appendChild(crearLi('Anterior', paginaActual === 1, false, () => {
+                if (paginaActual > 1) { paginaActual--; mostrarPagina(paginaActual); }
+            }));
+
+            // Páginas numeradas (si son muchas, podríamos truncar, pero por ahora mostramos todas)
+            for (let p = 1; p <= totalPaginas; p++) {
+                paginacionEl.appendChild(crearLi(p, false, p === paginaActual, () => {
+                    paginaActual = p; mostrarPagina(paginaActual);
+                }));
+            }
+
+            // Next
+            paginacionEl.appendChild(crearLi('Siguiente', paginaActual === totalPaginas, false, () => {
+                if (paginaActual < totalPaginas) { paginaActual++; mostrarPagina(paginaActual); }
+            }));
         }
 
         // cuando cambias la cantidad en el select
         selectRegistros.addEventListener("change", () => {
-            registrosPorPagina = parseInt(selectRegistros.value);
+            filas = tabla.querySelectorAll("tr");
             paginaActual = 1;
             mostrarPagina(paginaActual);
         });
 
         // inicia mostrando la primera página
         mostrarPagina(paginaActual);
-    });
+    };
 
 </script>
 

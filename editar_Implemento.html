@@ -481,8 +481,10 @@
             estado
         };
         console.log(datos);
-        actualizarImplemento(datos);
-        window.location.href = `index.html`;
+        const result = await actualizarImplemento(datos);
+        if (result) {
+            window.location.href = `index.html`;
+        }
     })
 
 
@@ -620,7 +622,7 @@
 
     function actualizarImplemento(datos) {
         const id = sessionStorage.getItem('id');
-        fetchConToken(`http://localhost:3000/api/inventario/implemento/` + id, {
+        return fetchConToken(`http://localhost:3000/api/inventario/implemento/` + id, {
             method: 'PUT',
             body: JSON.stringify(datos)
         })
@@ -628,13 +630,13 @@
             .then(data => {
                 console.log('✔ Actualizado Correctamente:', data);
                 alert(data.mensaje);
-
+                return data;
             })
             .catch(error => {
                 console.error('❌ Error al enviar al backend:', error);
                 alert('Error al guardar en la base de datos');
+                return null;
             });
-        alert('✅ Actualizado Correctamente');
     }
 
     const menu = document.getElementById("menu");
