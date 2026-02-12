@@ -3,7 +3,7 @@ const tabla = document.querySelector('#tabla #tabla-body');
 
 // ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
 async function fetchConToken(url, opciones = {}) {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   if (!token) {
     console.log('❌ No hay token, redirigiendo a login');
@@ -25,9 +25,9 @@ async function fetchConToken(url, opciones = {}) {
 
     if (response.status === 401 || response.status === 403) {
       console.log('❌ Token expirado o inválido');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('role');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('role');
       alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
       window.location.href = 'login.html';
       return;
@@ -72,15 +72,34 @@ async function cargarImplementos() {
                 fila.insertCell().textContent = implemento.estado;
                 const btnEditar = document.createElement('button');
                 btnEditar.textContent = 'Editar';
-                btnEditar.className = 'btn btn-secondary btn-sm align-items-center';
+                btnEditar.className = 'btn btn-secondary btn-sm align-items-center btn-edit';
                 btnEditar.style = 'float: center;';
                 btnEditar.dataset.id = implemento.id;
                 console.log(implemento);
+                // Evitar que usuarios sin rol administrador activen la edición
+                function getRoleFromToken() {
+                  const token = sessionStorage.getItem('token');
+                  if (!token) return null;
+                  try {
+                    const partes = token.split('.');
+                    if (partes.length !== 3) return null;
+                    const payload = JSON.parse(atob(partes[1]));
+                    return payload?.role || null;
+                  } catch (e) {
+                    return null;
+                  }
+                }
+
                 btnEditar.onclick = (dataset) => {
-                    const id = dataset.target.dataset.id;
-                    console.log("📌 Guardando id en sessionStorage:", id);
-                    sessionStorage.setItem('id', id);
-                    window.location.href = `editar_Implemento.html`;
+                  const role = getRoleFromToken();
+                  if (role !== 'admin') {
+                    alert('No tienes permisos para editar este registro');
+                    return;
+                  }
+                  const id = dataset.target.dataset.id;
+                  console.log("📌 Guardando id en sessionStorage:", id);
+                  sessionStorage.setItem('id', id);
+                  window.location.href = `editar_Implemento.html`;
                 };
                   fila.insertCell().appendChild(btnEditar);
                 });
@@ -109,8 +128,34 @@ function activarExportar() {
 
     btnExportar.addEventListener("click", async () => {
         console.log("📌 Exportando inventario...");
-        const token = localStorage.getItem('token');
-        window.location.href = `http://localhost:3000/api/exportar?token=${token}`;
+        const token = sessionStorage.getItem('token');
+        
+        try {
+            const response = await fetch('http://localhost:3000/api/exportar', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Error en la exportación');
+            }
+            
+            // Descargar el archivo
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventario_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+        } catch (error) {
+            console.error('❌ Error al exportar:', error);
+            alert('Error al exportar el inventario');
+        }
     });
 }
 

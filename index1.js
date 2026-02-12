@@ -10,7 +10,7 @@ menu.addEventListener('click', () => {
 
 // ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
 async function fetchConToken(url, opciones = {}) {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   if (!token) {
     console.log('❌ No hay token, redirigiendo a login');
@@ -32,9 +32,9 @@ async function fetchConToken(url, opciones = {}) {
 
     if (response.status === 401 || response.status === 403) {
       console.log('❌ Token expirado o inválido');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('role');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('role');
       alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
       window.location.href = 'login.html';
       return;

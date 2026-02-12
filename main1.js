@@ -1,6 +1,6 @@
 // ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
 async function fetchConToken(url, opciones = {}) {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   // Si no hay token, redirigir a login
   if (!token) {
@@ -25,9 +25,8 @@ async function fetchConToken(url, opciones = {}) {
     // Si el token expiró o es inválido (401/403)
     if (response.status === 401 || response.status === 403) {
       console.log('❌ Token expirado o inválido');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('role');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
       window.location.href = 'login.html';
       return;
@@ -65,10 +64,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       throw new Error(data.mensaje || 'Error en login');
     }
 
-    // ✅ Guardar token, usuario y rol
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', data.user);
-    localStorage.setItem('role', data.role);
+    // ✅ Guardar SOLO el token en sessionStorage (user y role viajan en el JWT)
+    sessionStorage.setItem('token', data.token);
 
     console.log('✅ Login exitoso:', data);
     

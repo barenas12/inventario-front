@@ -38,7 +38,7 @@
                     <img src="icons/library.svg" alt="library">
                     <span>Inventario</span>
                 </a>
-                <a href="inventario-front/src/crear_Implemento.html">
+                <a href="index.html" data-admin>
                     <img src="icons/file.svg" alt="add_implement">
                     <span>Añadir Implemento</span>
                 </a>
@@ -222,7 +222,7 @@
 <script>
     // ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
     async function fetchConToken(url, opciones = {}) {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       if (!token) {
         console.log('❌ No hay token, redirigiendo a login');
@@ -244,9 +244,9 @@
 
         if (response.status === 401 || response.status === 403) {
           console.log('❌ Token expirado o inválido');
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          localStorage.removeItem('role');
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          sessionStorage.removeItem('role');
           alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
           window.location.href = 'login.html';
           return;
@@ -900,6 +900,11 @@
         list-style: none;
         padding-left: 0;
         margin: 0;
+    }
+
+    /* Clase para ocultar elementos sin romper el layout */
+    .hidden {
+        display: none !important;
     }
 
     @media (max-width:500px) {

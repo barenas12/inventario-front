@@ -42,7 +42,7 @@
                     <img src="icons/library.svg" alt="library">
                     <span>Inventario</span>
                 </a>
-                <a href="inventario-front/src/crear_Implemento.html">
+                <a href="inventario-front/src/crear_Implemento.html" data-admin>
                     <img src="icons/file.svg" alt="add_implement">
                     <span>Insertar Implemento</span>
                 </a>
@@ -398,6 +398,11 @@
         list-style: none;
         padding-left: 0;
         margin: 0;
+    }
+
+    /* Clase para ocultar elementos sin romper el layout */
+    .hidden {
+        display: none !important;
     }
     
 
