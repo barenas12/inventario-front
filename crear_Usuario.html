@@ -6,14 +6,12 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Inventario Recovery</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-
     <script src='sessionControl.js'></script>
-    <script src='index1.js' defer></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 </head>
 
-<body onload="recorrerDepartamentos(); recorrerResponsable()">
+<body>
     <header>
         <div class="left">
             <div class="menu-container">
@@ -40,11 +38,11 @@
                     <img src="icons/library.svg" alt="library">
                     <span>Inventario</span>
                 </a>
-                <a href="crear_Implemento.html" class="selected">
+                <a href="crear_Implemento.html">
                     <img src="icons/file.svg" alt="add_implement">
                     <span>Insertar Implemento</span>
                 </a>
-                <a href="responsable.html" data-admin>
+                <a href="responsable.html" class="selected" data-admin>
                     <img src="icons/profile.svg" alt="profile">
                     <span>Usuarios</span>
                 </a>
@@ -67,15 +65,14 @@
             </ul>
         </nav>
     </div>
-
     <main>
         <section class="name1">
-            Agregando Implemento
+            Editando Usuario
         </section>
         <div class="col-right d-flex gap-2 justify-content-end">
             <label class="form-label fw-bold d-block">&nbsp;</label>
-            <a href="index.html">
-                <button class="btn btn-success">Inventario</button>
+            <a href="responsable.html">
+                <button class="btn btn-success">Usuarios</button>
             </a>
         </div>
         <br>
@@ -83,124 +80,33 @@
             <form class="form-select" size="3" aria-label="Size 3 select example" id="formulario">
                 <div class="row justify-content-md-center">
                     <div class="form-group col-md-2">
-                        <label for="categoria">Categoria </label>
+                        <label for="nombre">Nombre </label>
                         <div>
-                            <select onchange="activarCategoria(); nombre()" class="form-select"
-                                aria-label="Default select example" id="categoria">
-                                <option value="" disabled selected>Seleccione la categoría</option>
-                                <option value="Equipos de computo">Equipos de computo</option>
-                                <option value="Muebles">Muebles</option>
+                            <input class="form-control" aria-label="Default select example" id="nombre">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label for="apellido">Apellido</label>
+                        <div>
+                            <input class="form-control" aria-label="Default select example" id="apellido">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label for="usuario">Usuario</label>
+                        <div>
+                            <input class="form-control" aria-label="Default select example" id="usuario">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label for="Rol">Rol</label>
+                        <div>
+                            <select class="form-select" aria-label="Default select example" id="rol">
+                                <option value="Administrador">Administrador</option>
+                                <option value="Gestor">Gestor</option>
                             </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group col-md-2">
-                        <label for="implemento_name">Tipo de implemento </label>
-                        <div>
-                            <select name="implemento_name" class="form-select" aria-label="Default select example"
-                                id="implemento_name">
-                                <option value="" disabled selected>Seleccione el implemento</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group col-md-2">
-                        <label for="departamento">Departamento</label>
-                        <div>
-                            <select name="departamento" class="form-select" aria-label="Default select example"
-                                id="departamento">
-                                <option value="" disabled selected>Seleccione el departamento</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group col-md-2">
-                        <label for="estado">Condición</label>
-                        <div>
-                            <select onchange="activarCondicion()" class="form-select"
-                                aria-label="Default select example" id="condicion">
-                                <option value="" disabled selected>Seleccione la Condición</option>
-                                <option value="Nuevo">Nuevo</option>
-                                <option value="Bueno">Bueno</option>
-                                <option value="Regular">Regular</option>
-                                <option value="Malo">Malo</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group col-md-2">
-                        <label for="Sede">Sede</label>
-                        <div>
-                            <select onchange="activarSede()" class="form-select" arial-label="Default select example"
-                                id="sede">
-                                <option value="" disabled selected>Seleccione a quien pertenece</option>
-                                <option value="Bello">Bello</option>
-                                <option value="Cali">Cali</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <br>
-
-                <div class="row justify-content-md-center">
-                    <div class="form-group col-md-2">
-                        <label for="Responsable">Responsable</label>
-                        <div>
-                            <select onchange="" class="form-select" arial-label="Default select example"
-                                id="responsable">
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label for="Pertenencia">Propiedad </label>
-                        <div>
-                            <select onchange="activarPertenencia()" class="form-select"
-                                aria-label="Default select example" id="pertenencia">
-                                <option value="" disabled selected>Seleccione a quien pertenece</option>
-                                <option value="Propio">Propio</option>
-                                <option value="Alquiler">Alquiler</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group col-md-2">
-                        <label for="Propietario">Propietario</label>
-                        <div>
-                            <select class="form-select" aria-label="Default select example" id="propietario">
-                                <option value="" disabled selected>Seleccione el propietario</option>
-                                <option value="1">Abogados Recovery</option>
-                                <option value="2">Milenio Pc</option>
-                                <option value="3">Flycomm</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label for="fecha">Fecha</label>
-                        <div>
-                            <input onchange="activarFecha()" class="form-control" type="date" name="fecha"
-                                placeholder="Ingrese la Fecha" id="fecha">
-                        </div>
-
-                    </div>
-
-                    <div class="form-group col-md-2">
-                        <label for="valor">Valor</label>
-                        <div>
-                            <input onchange="activarValor()" class="form-control" type="number" name="valor"
-                                placeholder="Ingrese el valor" id="valor">
-                        </div>
-                    </div>
-
-
-                </div>
-                <br>
-                <div class="row justify-content-md-center">
-                    <div class="form-group col-md-2">
-                        <label for="Descripción">Descripción</label>
-                        <div>
-                            <input onchange="activarDescripcion()" class="form-control" name="descripcion"
-                                placeholder="Añade la descripción" id="descripcion">
                         </div>
                     </div>
                 </div>
@@ -219,6 +125,174 @@
         </section>
     </main>
 </body>
+<script>
+    // ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
+    async function fetchConToken(url, opciones = {}) {
+        const token = sessionStorage.getItem('token');
+
+        if (!token) {
+            console.log('❌ No hay token, redirigiendo a login');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...opciones.headers
+        };
+
+        try {
+            const response = await fetch(url, {
+                ...opciones,
+                headers
+            });
+
+            if (response.status === 401) {
+                console.log('❌ Token expirado o inválido');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
+                sessionStorage.removeItem('role');
+                alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                window.location.href = 'login.html';
+                return;
+            }
+            if (response.status === 403) {
+                // permiso denegado, no quitamos el token
+                console.log('❌ Acceso denegado - sin permisos');
+                alert('No tienes permisos para realizar esta acción.');
+                return response; // dejar que el código que llamó maneje el 403
+            }
+
+            return response;
+        } catch (error) {
+            console.error('❌ Error en request:', error);
+            throw error;
+        }
+    }
+    // Captura la información del nombre del implemento en el formulario
+    function activarId() {
+        const id = document.querySelector('#id');
+        if (id.value == "") {
+            alert("Por favor, seleccione un implemento");
+            return null;
+        }
+        return id.value;
+    }
+    // Captura la información del nombre de la categoria en el formulario
+    function activarNombre() {
+        const nombre = document.querySelector('#nombre');
+        if (nombre.value == "") {
+            alert("Por favor, seleccione un nombre");
+            return null;
+        }
+        return nombre.value;
+    }
+    // Captura la información del nombre del departamento en el formulario
+    function activarApellido() {
+        const apellido = document.querySelector('#apellido');
+        if (apellido.value == "") {
+            alert("Por favor, seleccione un apellido");
+            return null;
+        }
+        return apellido.value;
+    }
+    // Captura la información del nombre de la condición en el formulario
+    function activarUsuario() {
+        const usuario = document.querySelector('#usuario');
+        if (usuario.value == "") {
+            alert("Por favor, seleccione el usuario");
+            return null;
+        }
+        return usuario.value;
+    }
+    // Captura la información del nombre del propietario en el formulario
+    function activarRol() {
+        const rol = document.querySelector('#rol');
+        if (rol.value == "") {
+            alert("Por favor, seleccione el rol del usuario");
+            return null;
+        }
+        return rol.value;
+    }
+    //Inserta la información en la tabla del front
+    const tabla = document.querySelector('#tabla #tabla-body');
+
+    // Captura la información del formulario y la agrega a la tabla
+    const form = document.querySelector('#formulario');
+
+
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const nombre = activarNombre();
+        const apellido = activarApellido();
+        const usuario = activarUsuario();
+        const rol = activarRol();
+
+        if (!nombre || !apellido || !usuario || !rol) {
+            return;
+        }
+
+        const datos = {
+            nombre,
+            apellido,
+            usuario,
+            rol
+        };
+        console.log(datos);
+        try {
+            const response = await enviarAlBackend(datos);
+            if (response && response.password) {
+                // ya se mostró alerta en enviarAlBackend
+            } else {
+                alert('✅ Datos guardados correctamente');
+            }
+            window.location.href = `responsable.html`;
+        } catch (e) {
+            // el error ya fue manejado en enviarAlBackend
+        }
+    })
+
+    function enviarAlBackend(datos) {
+        return fetchConToken('http://localhost:3000/api/login/users', {
+            method: 'POST',
+            body: JSON.stringify(datos)
+        })
+            .then(res => {
+                if (!res) return null;
+                return res.json();
+            })
+            .then(data => {
+                console.log('✔ Enviado al backend:', data);
+                if (data && data.password) {
+                    alert(`Usuario creado. Contraseña inicial: ${data.password}`);
+                }
+                return data;
+            })
+            .catch(error => {
+                console.error('❌ Error al enviar al backend:', error);
+                alert('Error al guardar en la base de datos');
+                throw error;
+            });
+    }
+
+    const menu = document.getElementById("menu");
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main")
+
+    menu.addEventListener('click', () => {
+        sidebar.classList.toggle('menu-toggle');
+        menu.classList.toggle('menu-toggle');
+        main.classList.toggle('menu-toggle');
+    })
+    // ✅ CERRAR SESIÓN
+    function cerrarSesion() {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    }
+
+</script>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 
@@ -235,6 +309,29 @@
         padding: 4px;
     }
 
+
+    header {
+        width: 100%;
+        z-index: 200;
+        display: flex;
+        justify-content: space-between;
+        padding: 0.45rem
+            /*Superior*/
+            2rem
+            /*Derecha*/
+            0.45rem
+            /*Abajo*/
+            1.27rem
+            /*Izquierda*/
+        ;
+        border-bottom: 1px solid var(--border-color);
+        position: fixed;
+        background-color: var(--background-color);
+        top: 0;
+        left: 0;
+
+
+    }
 
     header {
         width: 100%;
@@ -412,7 +509,7 @@
     }
 
     .sidebar.menu-toggle {
-        width: 16rem;
+        width: 15rem;
         margin-right: 16rem;
     }
 
@@ -447,6 +544,11 @@
         list-style: none;
         padding-left: 0;
         margin: 0;
+    }
+
+    /* Clase para ocultar elementos sin romper el layout */
+    .hidden {
+        display: none !important;
     }
 
     .sidebar-logout {

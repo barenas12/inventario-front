@@ -314,3 +314,9 @@ function recorrerImplementos() {
             console.error("¡Error!", error);
         })
 }
+
+// ✅ CERRAR SESIÓN
+function cerrarSesion() {
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+}

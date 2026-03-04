@@ -108,7 +108,7 @@ function validarPermisosUsuario() {
   const paginaActual = window.location.pathname.split('/').pop() || 'index.html';
   
   // Páginas que solo pueden acceder administradores
-  const paginasAdmin = ['crear_Implemento.html', 'editar_Implemento.html', 'reportes.html', 'usuarios.html', 'configuracion.html'];
+  const paginasAdmin = ['editar_Implemento.html','crear_Usuario.html','departamento.html','editar_Usuario.html','implemento.html','responsable.html','reportes.html', 'usuarios.html', 'configuracion.html'];
   
   // Validar acceso a página restringida
   if (paginasAdmin.includes(paginaActual) && role !== 'admin') {
@@ -133,22 +133,40 @@ function validarPermisosUsuario() {
     
     // Mostrar enlaces a páginas admin en el menú
     document.querySelectorAll('[data-admin]').forEach(el => el.classList.remove('hidden'));
+    document.querySelectorAll('[data-gestor]').forEach(el => el.classList.remove('hidden'));
     
     console.log('✅ Permisos de administrador activados');
+  } else if (role === 'gestor') {
+    // Gestor: Solo lectura, sin permisos de crear, editar o eliminar
+    const btnExportar = document.getElementById('exportar');
+    const btnCrear = document.querySelectorAll('.btn-create');
+    const btnEditar = document.querySelectorAll('.btn-edit');
+    const btnEliminar = document.querySelectorAll('.btn-danger');
+    
+    // Ocultar todos los botones de acción
+    if (btnExportar) btnExportar.classList.add('hidden');
+    btnCrear.forEach(btn => btn.classList.add('hidden'));
+    btnEditar.forEach(btn => btn.classList.add('hidden'));
+    btnEliminar.forEach(btn => btn.classList.add('hidden'));
+    
+    // Ocultar enlaces de admin, mostrar enlaces de gestor
+    document.querySelectorAll('[data-admin]').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('[data-gestor]').forEach(el => el.classList.remove('hidden'));
+    
+    console.log('✅ Permisos de gestor activados - Acceso de solo lectura');
   } else if (role === 'user') {
     // Ocultar botones administrativos
     const btnExportar = document.getElementById('exportar');
-    const btnEliminar = document.querySelectorAll('.btn-danger');
     const btnCrear = document.querySelectorAll('.btn-create');
     const btnEditar = document.querySelectorAll('.btn-edit');
     
     if (btnExportar) btnExportar.classList.add('hidden');
-    btnEliminar.forEach(btn => btn.classList.add('hidden'));
     btnCrear.forEach(btn => btn.classList.add('hidden'));
     btnEditar.forEach(btn => btn.classList.add('hidden'));
     
-    // Ocultar enlaces a páginas admin en el menú
+    // Ocultar enlaces a páginas admin y gestor
     document.querySelectorAll('[data-admin]').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('[data-gestor]').forEach(el => el.classList.add('hidden'));
     
     console.log('⚠️ Acceso restringido - Usuario sin permisos administrativos');
   }

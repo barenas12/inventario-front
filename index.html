@@ -11,6 +11,7 @@
     <script src='sessionControl.js'></script>
     <script src='index.js' defer></script>
 </head>
+
 <body>
     <header>
         <div class="left">
@@ -40,27 +41,35 @@
     <div class="sidebar" id="sidebar">
         <nav>
             <ul>
-                <a href="#" class="selected">
+                <a href="index.html" class="selected">
                     <img src="icons/library.svg" alt="library">
                     <span>Inventario</span>
                 </a>
-                <a href="crear_Implemento.html" data-admin>
+                <a href="crear_Implemento.html" data-gestor>
                     <img src="icons/file.svg" alt="add_implement">
                     <span>Insertar Implemento</span>
                 </a>
-                <a href="#" data-admin>
-                    <img src="icons/profile.svg" daalt="profile">
-                    <span>Responsable</span>
+                <a href="responsable.html" data-admin>
+                    <img src="icons/profile.svg" alt="profile">
+                    <span>Usuarios</span>
                 </a>
-                <a href="#" data-admin>
+                <a href="departamento.html" data-admin>
                     <img src="icons/departament.svg" alt="settings">
                     <span>Departamento</span>
                 </a>
-                <a href="#" data-admin>
+                <a href="implemento.html" data-admin>
                     <img src="icons/implement.svg" alt="settings">
                     <span>Implemento</span>
                 </a>
+                <a href="dashboard.html" data-admin>
+                    <img src="icons/dashboard.svg" alt="settings">
+                    <span>Reportes</span>
+                </a>
             </ul>
+            <a id="btnCerrarSesion" onclick="cerrarSesion()" style="cursor:pointer;">
+                <img src="icons/logout.svg" alt="logout">
+                <span>Cerrar Sesión</span>
+            </a>
         </nav>
     </div>
 
@@ -268,7 +277,11 @@
         // inicia mostrando la primera página
         mostrarPagina(paginaActual);
     };
-
+    // ✅ CERRAR SESIÓN
+    function cerrarSesion() {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    }
 </script>
 
 <style>
@@ -497,7 +510,7 @@
     }
 
     .sidebar.menu-toggle~main {
-        margin-left: 14rem;
+        margin-left: 15rem;
         margin-right: -1rem;
     }
 
@@ -539,11 +552,40 @@
         margin: 0;
     }
 
-    /* Clase para ocultar elementos sin romper el layout */
-    .hidden {
-        display: none !important;
+    /* Botón cerrar sesión al fondo del sidebar */
+    .sidebar-logout {
+        position: fixed;
+        bottom: 1rem;
+        left: 0;
+        width: inherit;
+        /* hereda el ancho del sidebar */
+        padding: 0 0.5rem;
     }
-    
+
+    .sidebar-logout a {
+        display: flex;
+        align-items: center;
+        gap: 1.3rem;
+        padding: 0.9rem 0.7rem;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        color: #dc3545;
+        /* rojo para distinguirlo */
+        transition: background-color 0.2s;
+    }
+
+    .sidebar-logout a:hover {
+        background-color: #fff0f0;
+    }
+
+    .sidebar-logout img {
+        width: 1.6rem;
+        flex-shrink: 0;
+        /* Si tu ícono es oscuro y quieres que se vea rojo: */
+        filter: invert(27%) sepia(90%) saturate(700%) hue-rotate(330deg);
+    }
 
     #tabla td:first-child {
         white-space: nowrap;
@@ -574,7 +616,6 @@
             margin-left: 0;
         }
     }
-
 </style>
 
 </html>

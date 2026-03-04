@@ -34,25 +34,33 @@
     <div class="sidebar" id="sidebar">
         <nav>
             <ul>
-                <a href="index.html">
+                <a href="index.html" class="selected">
                     <img src="icons/library.svg" alt="library">
                     <span>Inventario</span>
                 </a>
-                <a href="index.html" data-admin>
+                <a href="crear_Implemento.html">
                     <img src="icons/file.svg" alt="add_implement">
-                    <span>Añadir Implemento</span>
+                    <span>Insertar Implemento</span>
                 </a>
-                <a href="#">
+                <a href="responsable.html" data-admin>
                     <img src="icons/profile.svg" alt="profile">
-                    <span>Agregar Responsable</span>
+                    <span>Usuarios</span>
                 </a>
-                <a href="#">
+                <a href="departamento.html" data-admin>
                     <img src="icons/departament.svg" alt="settings">
-                    <span>Agregar Departamento</span>
+                    <span>Departamento</span>
                 </a>
-                <a href="#">
+                <a href="implemento.html" data-admin>
                     <img src="icons/implement.svg" alt="settings">
-                    <span>Agregar Implemento</span>
+                    <span>Implemento</span>
+                </a>
+                <a href="dashboard.html" data-admin>
+                    <img src="icons/dashboard.svg" alt="settings">
+                    <span>Reportes</span>
+                </a>
+                <a id="btnCerrarSesion" onclick="cerrarSesion()" style="cursor:pointer;">
+                    <img src="icons/logout.svg" alt="logout">
+                    <span>Cerrar Sesión</span>
                 </a>
             </ul>
         </nav>
@@ -222,41 +230,41 @@
 <script>
     // ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
     async function fetchConToken(url, opciones = {}) {
-      const token = sessionStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
 
-      if (!token) {
-        console.log('❌ No hay token, redirigiendo a login');
-        window.location.href = 'login.html';
-        return;
-      }
-
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...opciones.headers
-      };
-
-      try {
-        const response = await fetch(url, {
-          ...opciones,
-          headers
-        });
-
-        if (response.status === 401 || response.status === 403) {
-          console.log('❌ Token expirado o inválido');
-          sessionStorage.removeItem('token');
-          sessionStorage.removeItem('user');
-          sessionStorage.removeItem('role');
-          alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
-          window.location.href = 'login.html';
-          return;
+        if (!token) {
+            console.log('❌ No hay token, redirigiendo a login');
+            window.location.href = 'login.html';
+            return;
         }
 
-        return response;
-      } catch (error) {
-        console.error('❌ Error en request:', error);
-        throw error;
-      }
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...opciones.headers
+        };
+
+        try {
+            const response = await fetch(url, {
+                ...opciones,
+                headers
+            });
+
+            if (response.status === 401 || response.status === 403) {
+                console.log('❌ Token expirado o inválido');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
+                sessionStorage.removeItem('role');
+                alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            return response;
+        } catch (error) {
+            console.error('❌ Error en request:', error);
+            throw error;
+        }
     }
 
     (async () => {
@@ -905,6 +913,40 @@
     /* Clase para ocultar elementos sin romper el layout */
     .hidden {
         display: none !important;
+    }
+
+    .sidebar-logout {
+        position: fixed;
+        bottom: 1rem;
+        left: 0;
+        width: inherit;
+        /* hereda el ancho del sidebar */
+        padding: 0 0.5rem;
+    }
+
+    .sidebar-logout a {
+        display: flex;
+        align-items: center;
+        gap: 1.3rem;
+        padding: 0.9rem 0.7rem;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        color: #dc3545;
+        /* rojo para distinguirlo */
+        transition: background-color 0.2s;
+    }
+
+    .sidebar-logout a:hover {
+        background-color: #fff0f0;
+    }
+
+    .sidebar-logout img {
+        width: 1.6rem;
+        flex-shrink: 0;
+        /* Si tu ícono es oscuro y quieres que se vea rojo: */
+        filter: invert(27%) sepia(90%) saturate(700%) hue-rotate(330deg);
     }
 
     @media (max-width:500px) {

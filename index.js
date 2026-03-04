@@ -41,122 +41,122 @@ async function fetchConToken(url, opciones = {}) {
 }
 
 async function cargarImplementos() {
-    const response = await fetchConToken('http://localhost:3000/api/inventario/implemento', {
-        method: 'GET'
+  const response = await fetchConToken('http://localhost:3000/api/inventario/implemento', {
+    method: 'GET'
+  });
+  const data = await response.json();
+  const tabla = document.querySelector('#tabla-body');
+  tabla.innerHTML = '';
+
+  data.forEach(implemento => {
+    const fila = tabla.insertRow();
+    fila.insertCell().textContent = implemento.id_implemento;
+    fila.insertCell().textContent = implemento.nombre;
+    fila.insertCell().textContent = implemento.categoria;
+    fila.insertCell().textContent = implemento.departamento;
+    fila.insertCell().textContent = implemento.condicion;
+    fila.insertCell().textContent = implemento.pertenencia;
+    fila.insertCell().textContent = implemento.propietario;
+    fila.insertCell().textContent = implemento.responsable;
+    fila.insertCell().textContent = implemento.cantidad;
+    fila.insertCell().textContent = Number(implemento.valor).toLocaleString('es-CO');
+    const fecha = new Date(implemento.fecha);
+    const fechaFormateada = fecha.toLocaleDateString('es-CO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     });
-    const data = await response.json();
-            const tabla = document.querySelector('#tabla-body');
-            tabla.innerHTML = '';
+    fila.insertCell().textContent = fechaFormateada;
+    fila.insertCell().textContent = implemento.sede;
+    fila.insertCell().textContent = implemento.descripcion;
+    fila.insertCell().textContent = implemento.estado;
+    const btnEditar = document.createElement('button');
+    btnEditar.textContent = 'Editar';
+    btnEditar.className = 'btn btn-secondary btn-sm align-items-center btn-edit';
+    btnEditar.style = 'float: center;';
+    btnEditar.dataset.id = implemento.id;
+    console.log(implemento);
+    // Evitar que usuarios sin rol administrador activen la edición
+    function getRoleFromToken() {
+      const token = sessionStorage.getItem('token');
+      if (!token) return null;
+      try {
+        const partes = token.split('.');
+        if (partes.length !== 3) return null;
+        const payload = JSON.parse(atob(partes[1]));
+        return payload?.role || null;
+      } catch (e) {
+        return null;
+      }
+    }
 
-            data.forEach(implemento => {
-                const fila = tabla.insertRow();
-                fila.insertCell().textContent = implemento.id_implemento;
-                fila.insertCell().textContent = implemento.nombre;
-                fila.insertCell().textContent = implemento.categoria;
-                fila.insertCell().textContent = implemento.departamento;
-                fila.insertCell().textContent = implemento.condicion;
-                fila.insertCell().textContent = implemento.pertenencia;
-                fila.insertCell().textContent = implemento.propietario;
-                fila.insertCell().textContent = implemento.responsable;
-                fila.insertCell().textContent = implemento.cantidad;
-                fila.insertCell().textContent = Number(implemento.valor).toLocaleString('es-CO');
-                const fecha = new Date(implemento.fecha);
-                const fechaFormateada = fecha.toLocaleDateString('es-CO', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-                fila.insertCell().textContent = fechaFormateada;
-                fila.insertCell().textContent = implemento.sede;
-                fila.insertCell().textContent = implemento.descripcion;
-                fila.insertCell().textContent = implemento.estado;
-                const btnEditar = document.createElement('button');
-                btnEditar.textContent = 'Editar';
-                btnEditar.className = 'btn btn-secondary btn-sm align-items-center btn-edit';
-                btnEditar.style = 'float: center;';
-                btnEditar.dataset.id = implemento.id;
-                console.log(implemento);
-                // Evitar que usuarios sin rol administrador activen la edición
-                function getRoleFromToken() {
-                  const token = sessionStorage.getItem('token');
-                  if (!token) return null;
-                  try {
-                    const partes = token.split('.');
-                    if (partes.length !== 3) return null;
-                    const payload = JSON.parse(atob(partes[1]));
-                    return payload?.role || null;
-                  } catch (e) {
-                    return null;
-                  }
-                }
+    btnEditar.onclick = (dataset) => {
+      const role = getRoleFromToken();
+      if (role !== 'admin') {
+        alert('No tienes permisos para editar este registro');
+        return;
+      }
+      const id = dataset.target.dataset.id;
+      console.log("📌 Guardando id en sessionStorage:", id);
+      sessionStorage.setItem('id', id);
+      window.location.href = `editar_Implemento.html`;
+    };
+    fila.insertCell().appendChild(btnEditar);
+  });
 
-                btnEditar.onclick = (dataset) => {
-                  const role = getRoleFromToken();
-                  if (role !== 'admin') {
-                    alert('No tienes permisos para editar este registro');
-                    return;
-                  }
-                  const id = dataset.target.dataset.id;
-                  console.log("📌 Guardando id en sessionStorage:", id);
-                  sessionStorage.setItem('id', id);
-                  window.location.href = `editar_Implemento.html`;
-                };
-                  fila.insertCell().appendChild(btnEditar);
-                });
+  // actualizar contador total de registros
+  const totalEl = document.getElementById('totalRegistros');
+  if (totalEl) totalEl.textContent = `Total: ${data.length}`;
 
-                // actualizar contador total de registros
-                const totalEl = document.getElementById('totalRegistros');
-                if (totalEl) totalEl.textContent = `Total: ${data.length}`;
-
-                // inicializar/actualizar paginación ahora que la tabla tiene filas
-                if (typeof window.initPagination === 'function') {
-                  window.initPagination();
-                }
+  // inicializar/actualizar paginación ahora que la tabla tiene filas
+  if (typeof window.initPagination === 'function') {
+    window.initPagination();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    cargarImplementos();
+  cargarImplementos();
 });
 
 function activarExportar() {
-    const btnExportar = document.getElementById("exportar");
+  const btnExportar = document.getElementById("exportar");
 
-    if (!btnExportar) {
-        console.error("⚠️ No se encontró el botón con id 'exportar'");
-        return;
-    }
+  if (!btnExportar) {
+    console.error("⚠️ No se encontró el botón con id 'exportar'");
+    return;
+  }
 
-    btnExportar.addEventListener("click", async () => {
-        console.log("📌 Exportando inventario...");
-        const token = sessionStorage.getItem('token');
-        
-        try {
-            const response = await fetch('http://localhost:3000/api/exportar', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error('Error en la exportación');
-            }
-            
-            // Descargar el archivo
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `inventario_${new Date().toISOString().split('T')[0]}.xlsx`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-        } catch (error) {
-            console.error('❌ Error al exportar:', error);
-            alert('Error al exportar el inventario');
+  btnExportar.addEventListener("click", async () => {
+    console.log("📌 Exportando inventario...");
+    const token = sessionStorage.getItem('token');
+
+    try {
+      const response = await fetch('http://localhost:3000/api/exportar/implementos', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-    });
+      });
+
+      if (!response.ok) {
+        throw new Error('Error en la exportación');
+      }
+
+      // Descargar el archivo
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `inventario_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    } catch (error) {
+      console.error('❌ Error al exportar:', error);
+      alert('Error al exportar el inventario');
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", activarExportar);
@@ -166,7 +166,13 @@ const sidebar = document.getElementById("sidebar");
 const main = document.getElementById("main")
 
 menu.addEventListener('click', () => {
-    sidebar.classList.toggle('menu-toggle');
-    menu.classList.toggle('menu-toggle');
-    main.classList.toggle('menu-toggle');
+  sidebar.classList.toggle('menu-toggle');
+  menu.classList.toggle('menu-toggle');
+  main.classList.toggle('menu-toggle');
 })
+
+// ✅ CERRAR SESIÓN
+function cerrarSesion() {
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+}
