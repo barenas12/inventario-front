@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Inventario Recovery</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src='sessionControl.js'></script>
+    <link rel="icon" href="img/img_rem.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+</head>
+
+<body>
+    <header>
+        <div class="left">
+            <div class="menu-container">
+                <div class="menu" id="menu">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+            <div class="brand">
+                <img src="img/img_rem.png" alt="logo Recovery" class="logo">
+                <span class="name">Arcsas</span>
+            </div>
+        </div>
+        <div class="header-content">
+            <span class="name1">INVENTARIO</span>
+        </div>
+        <div class="ghost-button"></div>
+    </header>
+    <div class="sidebar" id="sidebar">
+        <nav>
+            <ul>
+                <a href="dashboard.html" data-admin>
+                    <img src="icons/dashboard.svg" alt="settings">
+                    <span>Reportes</span>
+                </a>
+                <a href="index.html">
+                    <img src="icons/library.svg" alt="library">
+                    <span>Inventario</span>
+                </a>
+                <a href="usuario.html" class="selected" data-admin>
+                    <img src="icons/user.svg" alt="profile">
+                    <span>Usuarios</span>
+                </a>
+                <a href="departamento.html" data-admin>
+                    <img src="icons/departament.svg" alt="settings">
+                    <span>Agregar Departamento</span>
+                </a>
+                <a href="implemento.html" data-admin>
+                    <img src="icons/implement.svg" alt="settings">
+                    <span>Agregar Implemento</span>
+                </a>
+                <a href="persona.html" data-gestor>
+                    <img src="icons/profile-add.svg" alt="add_implement">
+                    <span>Agregar Responsable</span>
+                </a>
+            </ul>
+            <a id="btnCerrarSesion" onclick="cerrarSesion()" style="cursor:pointer;">
+                <img src="icons/logout.svg" alt="logout">
+                <span>Cerrar Sesión</span>
+            </a>
+        </nav>
+    </div>
+    <main>
+        <section class="name1">
+            Editando Usuario
+        </section>
+        <div class="col-right d-flex gap-2 justify-content-end">
+            <label class="form-label fw-bold d-block">&nbsp;</label>
+            <a href="usuario.html">
+                <button class="btn btn-success">Usuarios</button>
+            </a>
+        </div>
+        <br>
+        <section>
+            <form class="form-select" size="3" aria-label="Size 3 select example" id="formulario">
+                <div class="row justify-content-md-center">
+                    <div class="form-group col-md-2">
+                        <label for="id">ID del usuario</label>
+                        <div>
+                            <input class="form-control" type="text" name="id" id="id" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label for="nombre">Nombre</label>
+                        <div>
+                            <input class="form-control" type="text" name="nombre" aria-label="Default select example"
+                                id="nombre">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label for="apellido">Apellido</label>
+                        <div>
+                            <input class="form-control" type="text" name="apellido" aria-label="Default select example"
+                                id="apellido">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label for="usuario">Usuario</label>
+                        <div>
+                            <input class="form-control" type="text" name="usuario" aria-label="Default select example"
+                                id="usuario">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2">
+                        <label for="Rol">Rol</label>
+                        <div>
+                            <select class="form-select" aria-label="Default select example" id="rol">
+                                <option value="Administrador">Administrador</option>
+                                <option value="Gestor">Gestor</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="estado">Estado</label>
+                        <div>
+                            <select name="estado" class="form-select" name="estado" aria-label="Default select example"
+                                id="estado">
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="reset_pass">Resetear Contraseña</label>
+                    <div>
+                        <select class="form-select" arial-label="Default select example" id="reset_pass">
+                            <option value="" disabled selected>Seleccione una opción</option>
+                            <option value="Si">Si</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row justify-content-md-center">
+                    <div class="form-group col-md-2 just">
+                        <label for="botones"></label>
+                        <div>
+                            <button type='uptade' class="btn btn-primary" name="submit"
+                                id="btnUpdate">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+<script>
+    // ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
+    async function fetchConToken(url, opciones = {}) {
+        const token = sessionStorage.getItem('token');
+
+        if (!token) {
+            console.log('❌ No hay token, redirigiendo a login');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...opciones.headers
+        };
+
+        try {
+            const response = await fetch(url, {
+                ...opciones,
+                headers
+            });
+
+            if (response.status === 401) {
+                console.log('❌ Token expirado o inválido');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
+                sessionStorage.removeItem('role');
+                alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                window.location.href = 'login.html';
+                return;
+            }
+            if (response.status === 403) {
+                // permiso denegado, no quitamos el token
+                console.log('❌ Acceso denegado - sin permisos');
+                alert('No tienes permisos para realizar esta acción.');
+                return response; // dejar que el código que llamó maneje el 403
+            }
+
+            return response;
+        } catch (error) {
+            console.error('❌ Error en request:', error);
+            throw error;
+        }
+    }
+
+    (async () => {
+        const id = document.querySelector('#id');
+        const nombre = document.querySelector('#nombre');
+        const apellido = document.querySelector('#apellido');
+        const usuario = document.querySelector('#usuario');
+        const rol = document.querySelector('#rol');
+        const estado = document.querySelector('#estado');
+        const reset_pass = document.querySelector('#reset_pass');
+
+        traerInformacion().then(async (users) => {
+            console.log(users);
+
+            // Verifica si el objeto informacion está vacío
+            if (Object.keys(users).length === 0) {
+                console.error("Error: La información del usuario está vacía.");
+                alert("Error al cargar la información del usuario. Por favor, inténtelo de nuevo.");
+                return; // Sale de la función si la información está vacía
+            }
+
+            id.value = users.id;
+            nombre.value = users.nombre;
+            apellido.value = users.apellido;
+            usuario.value = users.user;
+            rol.value = users.role;
+            estado.value = users.status;
+            reset_pass.value = users.reset_pass;
+            console.log("Información de departamentos cargada correctamente.");
+        }).catch(error => {
+            console.error("Error al cargar la información de departamentos:", error);
+        });
+
+    })();
+    // Captura la información del ID en el formulario
+    function activarId() {
+        const id = document.querySelector('#id');
+        if (id.value == "") {
+            alert("Por favor, seleccione un implemento");
+            return null;
+        }
+        return id.value;
+    }
+    // Captura la información del nombre de la categoria en el formulario
+    function activarNombre() {
+        const nombre = document.querySelector('#nombre');
+        if (nombre.value == "") {
+            alert("Por favor, seleccione un nombre");
+            return null;
+        }
+        return nombre.value;
+    }
+    // Captura la información del apellido en el formulario
+    function activarApellido() {
+        const apellido = document.querySelector('#apellido');
+        if (apellido.value == "") {
+            alert("Por favor, seleccione un apellido");
+            return null;
+        }
+        return apellido.value;
+    }
+    // Captura la información del usuario en el formulario
+    function activarUsuario() {
+        const usuario = document.querySelector('#usuario');
+        if (usuario.value == "") {
+            alert("Por favor, seleccione el usuario");
+            return null;
+        }
+        return usuario.value;
+    }
+    // Captura la información del rol en el formulario
+    function activarRol() {
+        const rol = document.querySelector('#rol');
+        if (rol.value == "") {
+            alert("Por favor, seleccione el rol del usuario");
+            return null;
+        }
+        return rol.value;
+    }
+
+    function activarEstado() {
+        const estado = document.querySelector('#estado');
+        if (estado.value == "") {
+            alert("Por favor, seleccione una estado");
+            return null;
+        }
+        console.log(estado.value);
+        return estado.value;
+    }
+
+    function activarResetPass() {
+        const reset_pass = document.querySelector('#reset_pass');
+        if (reset_pass.value == "") {
+            alert("Por favor, seleccione una opción para resetear la contraseña");
+            return null;
+        }
+        console.log(reset_pass.value);
+        return reset_pass.value;
+    }
+    //Inserta la información en la tabla del front
+    const tabla = document.querySelector('#tabla #tabla-body');
+
+    // Captura la información del formulario y la agrega a la tabla
+    const form = document.querySelector('#formulario');
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const nombre = activarNombre();
+        const apellido = activarApellido();
+        const usuario = activarUsuario();
+        const rol = activarRol();
+        const estado = activarEstado();
+        const reset_pass = activarResetPass();
+
+        // si el usuario que está en sesión no es administrador, no intentamos llamar al PUT
+        let myRole = sessionStorage.getItem('role');
+        // cuando no haya kilometraje en sessionStorage lo sacamos del token
+        if (!myRole) {
+            const token = sessionStorage.getItem('token');
+            if (token) {
+                try {
+                    const partes = token.split('.');
+                    const payload = JSON.parse(atob(partes[1]));
+                    myRole = payload?.role;
+                } catch (e) {
+                    console.error('Error al decodificar rol del token', e);
+                }
+            }
+        }
+        // el backend normaliza el rol a 'admin' o 'user'
+        if (myRole !== 'admin') {
+            alert('Solo un administrador puede actualizar usuarios.');
+            return;
+        }
+
+        if (!nombre || !apellido || !usuario || !rol || !estado || !reset_pass) {
+            return;
+        }
+
+        const datos = {
+            nombre,
+            apellido,
+            usuario,
+            rol,
+            estado,
+            reset_pass
+        };
+        console.log(datos);
+        const result = await actualizarUsuario(datos);
+        if (result) {
+            window.location.href = `usuario.html`;
+        }
+    })
+
+    function traerInformacion() {
+        return new Promise((resolve, reject) => {
+            const id = sessionStorage.getItem('id');
+            const url = 'http://172.18.22.4:3000/api/login/users/' + id;
+            fetchConToken(url, {
+                method: 'GET',
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        // Si el estado no es OK, rechaza la promesa con un error
+                        return reject(new Error(`HTTP error! Status: ${res.status}`));
+                    }
+                    // Verifica si la respuesta está vacía
+                    if (res.status === 204) {
+                        return reject(new Error("No Content: La respuesta está vacía"));
+                    }
+                    return res.json();
+                })
+                .then(implemento => {
+                    resolve(implemento);
+                })
+                .catch(function (error) {
+                    console.error("¡Error!", error);
+                    reject(error);
+                });
+        })
+    }
+
+    function actualizarUsuario(datos) {
+        const id = sessionStorage.getItem('id');
+        return fetchConToken(`http://172.18.22.4:3000/api/login/users/` + id, {
+            method: 'PUT',
+            body: JSON.stringify(datos)
+        })
+            .then(res => {
+                if (!res) return null; // ya se manejó token/403 en fetchConToken
+                if (res.status === 403) {
+                    alert('No tienes permisos para actualizar este usuario.');
+                    return null;
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (!data) return null;
+                console.log('✔ Actualizado Correctamente:', data);
+                let msg = data.mensaje;
+                if (data.password) {
+                    msg += '\nNueva contraseña: ' + data.password;
+                }
+                alert(msg);
+                return data;
+            })
+            .catch(error => {
+                console.error('❌ Error al enviar al backend:', error);
+                alert('Error al guardar en la base de datos');
+                return null;
+            });
+    }
+
+    const menu = document.getElementById("menu");
+    const sidebar = document.getElementById("sidebar");
+    const main = document.getElementById("main")
+
+    menu.addEventListener('click', () => {
+        sidebar.classList.toggle('menu-toggle');
+        menu.classList.toggle('menu-toggle');
+        main.classList.toggle('menu-toggle');
+    })
+    // ✅ CERRAR SESIÓN
+    function cerrarSesion() {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    }
+
+</script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+    * {
+        font-family: "Nunito Sans", sans-serif;
+        font-size: 1;
+    }
+
+    body {
+        background-color: #F2F2F2;
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        padding: 4px;
+    }
+
+
+    header {
+        width: 100%;
+        z-index: 200;
+        display: flex;
+        justify-content: space-between;
+        padding: 0.45rem
+            /*Superior*/
+            2rem
+            /*Derecha*/
+            0.45rem
+            /*Abajo*/
+            1.27rem
+            /*Izquierda*/
+        ;
+        border-bottom: 1px solid var(--border-color);
+        position: fixed;
+        background-color: var(--background-color);
+        top: 0;
+        left: 0;
+
+
+    }
+
+    header {
+        width: 100%;
+        z-index: 200;
+        display: flex;
+        justify-content: space-between;
+        padding: 0.45rem
+            /*Superior*/
+            2rem
+            /*Derecha*/
+            0.45rem
+            /*Abajo*/
+            1.27rem
+            /*Izquierda*/
+        ;
+        border-bottom: 1px solid var(--border-color);
+        position: fixed;
+        background-color: var(--background-color);
+        top: 0;
+        left: 0;
+
+
+    }
+
+    .ghost-button {
+        width: 5.692rem;
+        /* mismo ancho que el botón original */
+        height: 40px;
+        /* opcional, para mantener altura */
+        visibility: hidden;
+    }
+
+    main {
+        margin-left: 2.6rem;
+        margin-right: -1.2rem;
+        padding: 1rem;
+        padding-top: 70px;
+        transition: margin-left 0.5s ease, margin-right 0.3s ease;
+    }
+
+    footer {
+        margin-left: 2.9rem;
+        margin-right: -1.2rem;
+        padding: 1rem;
+        padding-top: 70px;
+        transition: margin-left 0.5s ease, margin-right 0.3s ease;
+    }
+
+
+    /*Variable global*/
+    :root {
+        --background-color: white;
+        --text-title-color: #053D4E;
+        --text-color: #32363B;
+        --icon-color: #32363B;
+        --icon-menu-color: #707780;
+        --menu-color: #707780;
+
+        --text-selected-color: #355CC0;
+        --background-selected: #EBF0FF;
+        --background-hover: #F7F9FA;
+
+        --border-color: #E6E9ED;
+
+    }
+
+    .menu-container {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .left {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .menu {
+        width: 1.5rem;
+        height: 37%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /*Menú left*/
+
+    .menu div {
+        width: 100%;
+        height: 0.15rem;
+        background-color: var(--menu-color);
+        transition: all 0.2s ease;
+    }
+
+    .menu.menu-toggle div:first-child {
+        width: 40%;
+        transform: rotate(-35deg) translate(-30%, 175%)
+    }
+
+    .menu.menu-toggle div:last-child {
+        width: 40%;
+        transform: rotate(35deg) translate(-30%, -160%)
+    }
+
+    /*Brand*/
+
+    .brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+    }
+
+    .brand .logo {
+        width: 3.3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.4rem;
+    }
+
+    .brand .name {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: var(--text-title-color)
+    }
+
+    .name1 {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: var(--text-title-color);
+        display: flex;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        gap: 0.6rem;
+    }
+
+    /*Nav*/
+    .nav-img {
+        width: 11%;
+    }
+
+    nav a {
+        margin-top: 2px;
+        margin-right: 3px;
+        text-decoration: none;
+    }
+
+    nav a:hover {}
+
+    /*SideBar*/
+
+    .sidebar {
+        margin-top: 4rem;
+        width: 4rem;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        padding: 1.1rem 0;
+        border-right: solid var(--border-color);
+        overflow-y: auto;
+        background-color: var(--background-color);
+        transition: 0.5s;
+    }
+
+    .sidebar.menu-toggle~main {
+        margin-left: 14rem;
+        margin-right: -1rem;
+    }
+
+    .sidebar.menu-toggle {
+        width: 15rem;
+        margin-right: 16rem;
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 1.3rem;
+        padding: 0.9rem 0.7rem;
+        text-decoration: none;
+        margin: 0 0.5rem;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        color: var(--text-color);
+    }
+
+    .sidebar a:hover {
+        background-color: var(--background-hover);
+    }
+
+    .sidebar a.selected {
+        color: var(--text-selected-color);
+        background-color: var(--background-selected);
+    }
+
+    .sidebar img {
+        width: 1.6rem;
+        flex-shrink: 0;
+    }
+
+    .sidebar nav ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+
+    /* Clase para ocultar elementos sin romper el layout */
+    .hidden {
+        display: none !important;
+    }
+
+    .sidebar-logout {
+        position: fixed;
+        bottom: 1rem;
+        left: 0;
+        width: inherit;
+        /* hereda el ancho del sidebar */
+        padding: 0 0.5rem;
+    }
+
+    .sidebar-logout a {
+        display: flex;
+        align-items: center;
+        gap: 1.3rem;
+        padding: 0.9rem 0.7rem;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        color: #dc3545;
+        /* rojo para distinguirlo */
+        transition: background-color 0.2s;
+    }
+
+    .sidebar-logout a:hover {
+        background-color: #fff0f0;
+    }
+
+    .sidebar-logout img {
+        width: 1.6rem;
+        flex-shrink: 0;
+        /* Si tu ícono es oscuro y quieres que se vea rojo: */
+        filter: invert(27%) sepia(90%) saturate(700%) hue-rotate(330deg);
+    }
+
+    @media (max-width:500px) {
+        .sidebar {
+            width: 0;
+        }
+
+        .menu.menu-toggle div:first-child {
+            width: 40%;
+            transform: rotate(-35deg) translate(-30%, 175%)
+        }
+
+        .menu.menu-toggle div:last-child {
+            width: 40%;
+            transform: rotate(35deg) translate(-30%, -160%)
+        }
+
+        main {
+            margin-left: 0;
+        }
+
+        main.menu-toggle {
+            margin-left: 0;
+        }
+    }
+</style>
+
+</html>

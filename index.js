@@ -1,51 +1,208 @@
 //Inserta la información en la tabla del front
 const tabla = document.querySelector('#tabla #tabla-body');
 
+// ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
+async function fetchConToken(url, opciones = {}) {
+  const token = sessionStorage.getItem('token');
 
-function cargarImplementos() {
-    fetch('http://localhost:3000/api/inventario/implemento')
-        .then(response => response.json())
-        .then(data => {
-            const tabla = document.querySelector('#tabla-body');
-            tabla.innerHTML = '';
+  if (!token) {
+    console.log('❌ No hay token, redirigiendo a login');
+    window.location.href = 'login.html';
+    return;
+  }
 
-            data.forEach(implemento => {
-                const fila = tabla.insertRow();
-                fila.insertCell().textContent = implemento.id_implemento;
-                fila.insertCell().textContent = implemento.nombre;
-                fila.insertCell().textContent = implemento.categoria;
-                fila.insertCell().textContent = implemento.departamento;
-                fila.insertCell().textContent = implemento.condicion;
-                fila.insertCell().textContent = implemento.pertenencia;
-                fila.insertCell().textContent = implemento.propietario;
-                fila.insertCell().textContent = implemento.cantidad;
-                fila.insertCell().textContent = Number(implemento.valor).toLocaleString('es-CO');
-                const fecha = new Date(implemento.fecha);
-                const fechaFormateada = fecha.toLocaleDateString('es-CO', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-                fila.insertCell().textContent = fechaFormateada;
-                fila.insertCell().textContent = implemento.estado;
-                const btnEditar = document.createElement('button');
-                btnEditar.textContent = 'Editar';
-                btnEditar.className = 'btn btn-warning btn-sm align-items-center';
-                btnEditar.style = 'float: center;';
-                btnEditar.dataset.id_implemento = implemento.id_implemento;
-                btnEditar.onclick = (dataset) => {
-                    const id_implemento = dataset.target.dataset.id_implemento;
-                    console.log("imprimir valor", id_implemento);
-                    sessionStorage.setItem('id_implemento', id_implemento);
-                    window.location.href = `editar_frm.html`;
-                };
-                fila.insertCell().appendChild(btnEditar);
-            });
-        })
-        .catch(error => {
-            console.error('❌ Error al cargar implementos:', error);
-        })
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`,
+    ...opciones.headers
+  };
+
+  try {
+    const response = await fetch(url, {
+      ...opciones,
+      headers
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      console.log('❌ Token expirado o inválido');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+      sessionStorage.removeItem('role');
+      alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    return response;
+  } catch (error) {
+    console.error('❌ Error en request:', error);
+    throw error;
+  }
 }
+
+async function cargarImplementos() {
+  const response = await fetchConToken('http://172.18.22.4:3000/api/inventario/implemento', {
+    method: 'GET'
+  });
+  const data = await response.json();
+  const tabla = document.querySelector('#tabla-body');
+  tabla.innerHTML = '';
+
+  data.forEach(implemento => {
+    const fila = tabla.insertRow();
+    fila.insertCell().textContent = implemento.id_implemento;
+    fila.insertCell().textContent = implemento.nombre;
+    fila.insertCell().textContent = implemento.categoria;
+    fila.insertCell().textContent = implemento.departamento;
+    fila.insertCell().textContent = implemento.condicion;
+    fila.insertCell().textContent = implemento.pertenencia;
+    fila.insertCell().textContent = implemento.propietario;
+    fila.insertCell().textContent = implemento.responsable;
+    fila.insertCell().textContent = implemento.cantidad;
+    fila.insertCell().textContent = Number(implemento.valor).toLocaleString('es-CO');
+    const fecha = new Date(implemento.fecha);
+    const fechaFormateada = fecha.toLocaleDateString('es-CO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+    fila.insertCell().textContent = fechaFormateada;
+    fila.insertCell().textContent = implemento.sede;
+    fila.insertCell().textContent = implemento.descripcion;
+    fila.insertCell().textContent = implemento.estado;
+    const btnEditar = document.createElement('button');
+    btnEditar.textContent = 'Editar';
+    btnEditar.className = 'btn btn-secondary btn-sm align-items-center btn-edit';
+    btnEditar.style = 'float: center;';
+    btnEditar.dataset.id = implemento.id;
+    console.log(implemento);
+    // Evitar que usuarios sin rol administrador activen la edición
+    function getRoleFromToken() {
+      const token = sessionStorage.getItem('token');
+      if (!token) return null;
+      try {
+        const partes = token.split('.');
+        if (partes.length !== 3) return null;
+        const payload = JSON.parse(atob(partes[1]));
+        return payload?.role || null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    btnEditar.onclick = (dataset) => {
+      const role = getRoleFromToken();
+      if (role !== 'admin') {
+        alert('No tienes permisos para editar este registro');
+        return;
+      }
+      const id = dataset.target.dataset.id;
+      console.log("📌 Guardando id en sessionStorage:", id);
+      sessionStorage.setItem('id', id);
+      window.location.href = `editar_Implemento.html`;
+    };
+    fila.insertCell().appendChild(btnEditar);
+  });
+
+  // actualizar contador total de registros
+  const totalEl = document.getElementById('totalRegistros');
+  if (totalEl) totalEl.textContent = `Total: ${data.length}`;
+
+  // inicializar/actualizar paginación ahora que la tabla tiene filas
+  if (typeof window.initPagination === 'function') {
+    window.initPagination();
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    cargarImplementos();
+  cargarImplementos();
 });
+
+function activarExportar() {
+  const btnExportar = document.getElementById("exportar");
+
+  if (!btnExportar) {
+    console.error("⚠️ No se encontró el botón con id 'exportar'");
+    return;
+  }
+
+  btnExportar.addEventListener("click", async () => {
+    console.log("📌 Exportando inventario...");
+    const token = sessionStorage.getItem('token');
+
+    try {
+      const response = await fetch('http://172.18.22.4:3000/api/exportar/implementos', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error en la exportación');
+      }
+
+      // Descargar el archivo
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `inventario_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      a.remove();
+    } catch (error) {
+      console.error('❌ Error al exportar:', error);
+      alert('Error al exportar el inventario');
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", activarExportar);
+
+const menu = document.getElementById("menu");
+const sidebar = document.getElementById("sidebar");
+const main = document.getElementById("main")
+
+menu.addEventListener('click', () => {
+  sidebar.classList.toggle('menu-toggle');
+  menu.classList.toggle('menu-toggle');
+  main.classList.toggle('menu-toggle');
+})
+
+// ✅ CERRAR SESIÓN
+function cerrarSesion() {
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+}
+
+
+function aplicarPermisosSidebar() {
+  function getRoleFromToken() {
+    const token = sessionStorage.getItem('token');
+    if (!token) return null;
+    try {
+      const partes = token.split('.');
+      if (partes.length !== 3) return null;
+      const payload = JSON.parse(atob(partes[1]));
+      return payload?.role || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const role = getRoleFromToken();
+
+  // Oculta links exclusivos de admin si no es admin
+  document.querySelectorAll('[data-admin]').forEach(el => {
+    el.style.display = role === 'admin' ? '' : 'none';
+  });
+
+  // Oculta links exclusivos de gestor si no es gestor
+  document.querySelectorAll('[data-gestor]').forEach(el => {
+    el.style.display = role === 'gestor' ? '' : 'none';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', aplicarPermisosSidebar);
