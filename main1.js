@@ -132,7 +132,7 @@ function mostrarModalCambioContrasena() {
 
     try {
       const token = sessionStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/login/change-password', {
+      const response = await fetch('http://172.18.22.4:3000/api/login/change-password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const contrasena = document.getElementById('password').value;
 
   try {
-    const response = await fetch('http://localhost:3000/api/login', {
+    const response = await fetch('http://172.18.22.4:3000/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user: usuario, password: contrasena })
@@ -193,7 +193,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     }
 
     setTimeout(() => {
-      window.location.href = 'index.html';
+      window.location.href = 'dashboard.html';
     }, 800);
 
   } catch (error) {

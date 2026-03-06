@@ -7,6 +7,7 @@
     <title>Inventario Recovery</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <script src='sessionControl.js'></script>
+    <link rel="icon" href="img/img_rem.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 </head>
@@ -34,35 +35,35 @@
     <div class="sidebar" id="sidebar">
         <nav>
             <ul>
-                <a href="index.html" class="selected">
-                    <img src="icons/library.svg" alt="library">
-                    <span>Inventario</span>
-                </a>
-                <a href="crear_Implemento.html">
-                    <img src="icons/file.svg" alt="add_implement">
-                    <span>Insertar Implemento</span>
-                </a>
-                <a href="responsable.html" data-admin>
-                    <img src="icons/profile.svg" alt="profile">
-                    <span>Usuarios</span>
-                </a>
-                <a href="departamento.html" data-admin>
-                    <img src="icons/departament.svg" alt="settings">
-                    <span>Departamento</span>
-                </a>
-                <a href="implemento.html" data-admin>
-                    <img src="icons/implement.svg" alt="settings">
-                    <span>Implemento</span>
-                </a>
                 <a href="dashboard.html" data-admin>
                     <img src="icons/dashboard.svg" alt="settings">
                     <span>Reportes</span>
                 </a>
-                <a id="btnCerrarSesion" onclick="cerrarSesion()" style="cursor:pointer;">
-                    <img src="icons/logout.svg" alt="logout">
-                    <span>Cerrar Sesión</span>
+                <a href="index.html" class="selected">
+                    <img src="icons/library.svg" alt="library">
+                    <span>Inventario</span>
+                </a>
+                <a href="usuario.html" data-admin>
+                    <img src="icons/user.svg" alt="profile">
+                    <span>Usuarios</span>
+                </a>
+                <a href="departamento.html" data-admin>
+                    <img src="icons/departament.svg" alt="settings">
+                    <span>Agregar Departamento</span>
+                </a>
+                <a href="implemento.html" data-admin>
+                    <img src="icons/implement.svg" alt="settings">
+                    <span>Agregar Implemento</span>
+                </a>
+                <a href="persona.html" data-gestor>
+                    <img src="icons/profile-add.svg" alt="add_implement">
+                    <span>Agregar Responsable</span>
                 </a>
             </ul>
+            <a id="btnCerrarSesion" onclick="cerrarSesion()" style="cursor:pointer;">
+                <img src="icons/logout.svg" alt="logout">
+                <span>Cerrar Sesión</span>
+            </a>
         </nav>
     </div>
     <main>
@@ -156,10 +157,11 @@
                     </div>
 
                     <div class="form-group col-md-2">
-                        <label for="Pertenencia">Propiedad</label>
+                        <label for="Pertenencia">Propiedad </label>
                         <div>
-                            <select onchange="activarPertenencia()" class="form-select"
+                            <select onchange="activarPertenencia(); Propietario()" class="form-select"
                                 aria-label="Default select example" id="pertenencia">
+                                <option value="" disabled selected>Seleccione a quien pertenece</option>
                                 <option value="Propio">Propio</option>
                                 <option value="Alquiler">Alquiler</option>
                             </select>
@@ -169,10 +171,9 @@
                     <div class="form-group col-md-2">
                         <label for="Propietario">Propietario</label>
                         <div>
-                            <select class="form-select" aria-label="Default select example" id="propietario">
-                                <option value="1">Abogados Recovery</option>
-                                <option value="2">Milenio Pc</option>
-                                <option value="3">Flycomm</option>
+                            <select name="propietario" class="form-select" aria-label="Default select example"
+                                id="propietario">
+                                <option value="" disabled selected>Seleccione el propietario</option>
                             </select>
                         </div>
                     </div>
@@ -504,7 +505,7 @@
     async function nombre(selectedValue = null) {
         const name = document.querySelector("#implemento_name");
         const categoria = document.querySelector("#categoria").value;
-        const url = `http://localhost:3000/api/inventario/cat_implemento/${encodeURIComponent(categoria)}`;
+        const url = `http://172.18.22.4:3000/api/inventario/cat_implemento/${encodeURIComponent(categoria)}`;
 
         if (!categoria) {
             name.innerHTML = "";
@@ -516,7 +517,11 @@
         try {
             const res = await fetchConToken(url, { method: 'GET' });
             const lista_cat = await res.json();
-            for (let implemento of lista_cat) {
+
+            const activos = lista_cat.filter(d => d.estado === 'Activo');
+
+            for (let implemento of activos) {
+                
                 let nuevaOpcion = document.createElement("option");
                 nuevaOpcion.value = implemento.nom_implemento;
                 nuevaOpcion.text = implemento.nom_implemento;
@@ -531,11 +536,33 @@
         }
     }
 
+    function Propietario() {
+        const propietario = document.querySelector("#propietario");
+        const pertenencia = document.querySelector("#pertenencia").value;
+        const url = `http://172.18.22.4:3000/api/inventario/propietario/${encodeURIComponent(pertenencia)}`;
+        propietario.innerHTML = '<option value="" disabled selected>Seleccione el propietario</option>';
+        fetchConToken(url, {
+            method: 'GET',
+        })
+            .then(res => res.json())
+            .then(lista_cat => {
+                for (let propietarios of lista_cat) {
+                    let nuevaOpcion = document.createElement("option");
+                    nuevaOpcion.value = propietarios.id;
+                    nuevaOpcion.text = propietarios.nombre_proveedor;
+                    propietario.add(nuevaOpcion);
+                }
+            })
+            .catch(function (error) {
+                console.error("¡Error!", error);
+            });
+    }
+
 
     function recorrerDepartamentos() {
         return new Promise((resolve, reject) => {
             const select = document.querySelector("#departamento");
-            const url = 'http://localhost:3000/api/inventario/departamento';
+            const url = 'http://172.18.22.4:3000/department/get-departments';
             fetchConToken(url, {
                 method: 'GET',
             })
@@ -559,7 +586,7 @@
     function recorrerResponsable() {
         return new Promise((resolve, reject) => {
             const select = document.querySelector("#responsable");
-            const url = 'http://localhost:3000/api/inventario/responsable';
+            const url = 'http://172.18.22.4:3000/api/inventario/responsable';
             fetchConToken(url, {
                 method: 'GET',
             })
@@ -582,13 +609,15 @@
 
     function recorrerImplementos() {
         const select = document.querySelector("#categoria");
-        const url = 'http://localhost:3000/api/inventario/cat_implemento';
+        const url = 'http://172.18.22.4:3000/api/inventario/cat_implemento';
         fetchConToken(url, {
             method: 'GET',
         })
             .then(res => res.json())
             .then(lista_cat => {
-                for (let implemento of lista_cat) {
+                const activos = lista_cat.filter(d => d.estado === 'Activo');
+
+                for (let implemento of activos) {
                     let nuevaOpcion = document.createElement("option");
                     nuevaOpcion.value = implemento.id;
                     nuevaOpcion.text = implemento.nombre;
@@ -603,7 +632,7 @@
     function traerInformacion() {
         return new Promise((resolve, reject) => {
             const id = sessionStorage.getItem('id');
-            const url = 'http://localhost:3000/api/inventario/implemento/' + id;
+            const url = 'http://172.18.22.4:3000/api/inventario/implemento/' + id;
             fetchConToken(url, {
                 method: 'GET',
             })
@@ -630,7 +659,7 @@
 
     function actualizarImplemento(datos) {
         const id = sessionStorage.getItem('id');
-        return fetchConToken(`http://localhost:3000/api/inventario/implemento/` + id, {
+        return fetchConToken(`http://172.18.22.4:3000/api/inventario/implemento/` + id, {
             method: 'PUT',
             body: JSON.stringify(datos)
         })

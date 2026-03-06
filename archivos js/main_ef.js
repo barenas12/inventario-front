@@ -138,7 +138,7 @@ function limpiarFormulario() {
 }
 
 function enviarAlBackend(datos) {
-    fetchConToken('http://localhost:3000/api/inventario/implemento', {
+    fetchConToken('http://172.18.22.4:3000/api/inventario/implemento', {
         method: 'POST',
         body: JSON.stringify(datos)
     })
@@ -158,7 +158,7 @@ function enviarAlBackend(datos) {
 async function nombre(selectedValue = null) {
     const name = document.querySelector("#implemento_name");
     const categoria = document.querySelector("#categoria").value;
-    const url = `http://localhost:3000/api/inventario/cat_implemento/${encodeURIComponent(categoria)}`;
+    const url = `http://172.18.22.4:3000/api/inventario/cat_implemento/${encodeURIComponent(categoria)}`;
 
     if (!categoria) {
         name.innerHTML = "";
@@ -189,7 +189,7 @@ async function nombre(selectedValue = null) {
 function recorrerDepartamentos() {
     return new Promise((resolve, reject) => {
         const select = document.querySelector("#departamento");
-        const url = 'http://localhost:3000/api/inventario/departamento';
+        const url = 'http://172.18.22.4:3000/department/get-departments';
         fetchConToken(url, {
             method: 'GET',
         })
@@ -212,7 +212,7 @@ function recorrerDepartamentos() {
 
 function recorrerImplementos() {
     const select = document.querySelector("#categoria");
-    const url = 'http://localhost:3000/api/inventario/cat_implemento';
+    const url = 'http://172.18.22.4:3000/api/inventario/cat_implemento';
     fetchConToken(url, {
         method: 'GET',
     })
@@ -233,7 +233,7 @@ function recorrerImplementos() {
 function traerInformacion() {
     return new Promise((resolve, reject) => {
         const id = sessionStorage.getItem('id');
-        const url = 'http://localhost:3000/api/inventario/implemento/' + id;
+        const url = 'http://172.18.22.4:3000/api/inventario/implemento/' + id;
         fetchConToken(url, {
             method: 'GET',
         })
@@ -260,7 +260,7 @@ function traerInformacion() {
 
 function actualizarImplemento(datos) {
     const id = sessionStorage.getItem('id');
-    fetchConToken(`http://localhost:3000/api/inventario/implemento/` + id, {
+    fetchConToken(`http://172.18.22.4:3000/api/inventario/implemento/` + id, {
         method: 'PUT',
         body: JSON.stringify(datos)
     })

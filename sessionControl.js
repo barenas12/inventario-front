@@ -108,7 +108,7 @@ function validarPermisosUsuario() {
   const paginaActual = window.location.pathname.split('/').pop() || 'index.html';
   
   // Páginas que solo pueden acceder administradores
-  const paginasAdmin = ['editar_Implemento.html','crear_Usuario.html','departamento.html','editar_Usuario.html','implemento.html','responsable.html','reportes.html', 'usuarios.html', 'configuracion.html'];
+  const paginasAdmin = ['editar_Implemento.html','inventario-front/create/crear_Usuario.html','departamento.html','editar_Usuario.html','implemento.html','usuario.html','reportes.html', 'usuarios.html', 'configuracion.html'];
   
   // Validar acceso a página restringida
   if (paginasAdmin.includes(paginaActual) && role !== 'admin') {

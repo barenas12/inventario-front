@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <script src='sessionControl.js'></script>
+    <link rel="icon" href="img/img_rem.png" type="image/x-icon">
     <script src='index.js' defer></script>
 </head>
 
@@ -41,29 +42,29 @@
     <div class="sidebar" id="sidebar">
         <nav>
             <ul>
+                <a href="dashboard.html">
+                    <img src="icons/dashboard.svg" alt="settings">
+                    <span>Reportes</span>
+                </a>
                 <a href="index.html" class="selected">
                     <img src="icons/library.svg" alt="library">
                     <span>Inventario</span>
                 </a>
-                <a href="crear_Implemento.html" data-gestor>
-                    <img src="icons/file.svg" alt="add_implement">
-                    <span>Insertar Implemento</span>
-                </a>
-                <a href="responsable.html" data-admin>
-                    <img src="icons/profile.svg" alt="profile">
+                <a href="usuario.html" data-admin>
+                    <img src="icons/user.svg" alt="profile">
                     <span>Usuarios</span>
                 </a>
                 <a href="departamento.html" data-admin>
                     <img src="icons/departament.svg" alt="settings">
-                    <span>Departamento</span>
+                    <span>Agregar Departamento</span>
                 </a>
                 <a href="implemento.html" data-admin>
                     <img src="icons/implement.svg" alt="settings">
-                    <span>Implemento</span>
+                    <span>Agregar Implemento</span>
                 </a>
-                <a href="dashboard.html" data-admin>
-                    <img src="icons/dashboard.svg" alt="settings">
-                    <span>Reportes</span>
+                <a href="persona.html" data-gestor>
+                    <img src="icons/profile-add.svg" alt="add_implement">
+                    <span>Agregar Responsable</span>
                 </a>
             </ul>
             <a id="btnCerrarSesion" onclick="cerrarSesion()" style="cursor:pointer;">
@@ -89,6 +90,7 @@
                         <option value="6">Propietario</option>
                         <option value="7">Responsable</option>
                         <option value="11">Sede</option>
+                        <option value="12">Descripción</option>
                         <option value="13">Estado</option>
                     </select>
                 </div>
@@ -102,6 +104,9 @@
                     <label class="form-label fw-bold d-block">&nbsp;</label>
                     <button id="btnFiltrar" class="btn btn-primary" onclick="aplicarFiltro()">Aplicar</button>
                     <button class="btn btn-danger" onclick="limpiarFiltro()">Limpiar Filtro</button>
+                    <button id="crear_Implemento" class="btn btn-success"
+                        onclick="window.location.href='registrar_Implemento.html'">Registrar Implemento
+                    </button>
                 </div>
             </div>
         </section>
@@ -353,7 +358,8 @@
     nav a:hover {}
 
     section {
-        padding: 0
+        padding: 
+            0
             /*Superior*/
             2
             /*Derecha*/

@@ -4,12 +4,12 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Departamento</title>
+    <title>Responsable</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="icon" href="img/img_rem.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <script src='sessionControl.js'></script>
-    <script src='index.js' defer></script>
 </head>
 
 <body>
@@ -40,39 +40,409 @@
     <div class="sidebar" id="sidebar">
         <nav>
             <ul>
-                <a href="index.html">
-                    <img src="icons/library.svg" alt="library">
-                    <span>Inventario</span>
-                </a>
-                <a href="crear_Implemento.html">
-                    <img src="icons/file.svg" alt="add_implement">
-                    <span>Insertar Implemento</span>
-                </a>
-                <a href="responsable.html" data-admin>
-                    <img src="icons/profile.svg" alt="profile">
-                    <span>Usuarios</span>
-                </a>
-                <a href="departamento.html" class="selected" data-admin>
-                    <img src="icons/departament.svg" alt="settings">
-                    <span>Departamento</span>
-                </a>
-                <a href="implemento.html" data-admin>
-                    <img src="icons/implement.svg" alt="settings">
-                    <span>Implemento</span>
-                </a>
                 <a href="dashboard.html" data-admin>
                     <img src="icons/dashboard.svg" alt="settings">
                     <span>Reportes</span>
                 </a>
-                <a id="btnCerrarSesion" onclick="cerrarSesion()" style="cursor:pointer;">
-                    <img src="icons/logout.svg" alt="logout">
-                    <span>Cerrar Sesión</span>
+                <a href="index.html">
+                    <img src="icons/library.svg" alt="library">
+                    <span>Inventario</span>
+                </a>
+                <a href="usuario.html" data-admin>
+                    <img src="icons/user.svg" alt="profile">
+                    <span>Usuarios</span>
+                </a>
+                <a href="departamento.html" class="selected" data-admin>
+                    <img src="icons/departament.svg" alt="settings">
+                    <span>Agregar Departamento</span>
+                </a>
+                <a href="implemento.html" data-admin>
+                    <img src="icons/implement.svg" alt="settings">
+                    <span>Agregar Implemento</span>
+                </a>
+                <a href="persona.html" data-gestor>
+                    <img src="icons/profile-add.svg" alt="add_implement">
+                    <span>Agregar Responsable</span>
                 </a>
             </ul>
+            <a id="btnCerrarSesion" onclick="cerrarSesion()" style="cursor:pointer;">
+                <img src="icons/logout.svg" alt="logout">
+                <span>Cerrar Sesión</span>
+            </a>
         </nav>
     </div>
+    <main id="main">
+        <section>
+            <div class="row g-2 align-items-center mb-3 justify-content-end">
+                <div class="col-auto">
+                    <label for="columnaFiltro" class="form-label fw-bold">Filtrar por:</label>
+                    <select id="columnaFiltro" class="form-select">
+                        <option value="1">Nombre</option>
+                        <option value="2">Estado</option>
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <label for="valorFiltro" class="form-label fw-bold">Valor:</label>
+                    <input type="text" id="valorFiltro" class="form-control" placeholder="Ingrese valor">
+                </div>
+
+                <div class="col-auto">
+                    <label class="form-label fw-bold d-block">&nbsp;</label>
+                    <button id="btnFiltrar" class="btn btn-primary" onclick="aplicarFiltro()">Aplicar</button>
+                    <button class="btn btn-danger" onclick="limpiarFiltro()">Limpiar Filtro</button>
+                    <button id="crear_Departamento" class="btn btn-success"
+                        onclick="window.location.href='create/crear_Departamento.html'">Crear Departamento
+                    </button>
+                </div>
+            </div>
+        </section>
+        <section>
+            <table class="table table-striped-columns" id="tabla">
+                <thead>
+                    <tr>
+                        <th>Id Usuario</th>
+                        <th>Departamento</th>
+                        <th>Estado</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body2"></tbody>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between mb-2">
+                <div>
+                    <span id="totalRegistros" class="fw-bold"></span>
+                </div>
+                <div>
+                    <label for="registrosPorPagina" class="form-label">Mostrar:</label>
+                    <select id="registrosPorPagina" class="form-select d-inline-block w-auto">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="12">12</option>
+                        <option value="20">20</option>
+                        <option value="0">Todos</option>
+                    </select>
+                    <span> Registros por página</span>
+                </div>
+            </div>
+            <nav>
+                <ul class="pagination" id="paginacion"></ul>
+            </nav>
+        </section>
+    </main>
 </body>
+<script>
+    //Inserta la información en la tabla del front
+const tabla = document.querySelector('#tabla #tabla-body2');
+
+// ✅ FUNCIÓN PARA HACER REQUESTS CON JWT
+async function fetchConToken(url, opciones = {}) {
+    const token = sessionStorage.getItem('token');
+
+    if (!token) {
+        console.log('❌ No hay token, redirigiendo a login');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        ...opciones.headers
+    };
+
+    try {
+        const response = await fetch(url, {
+            ...opciones,
+            headers
+        });
+
+        if (response.status === 401) {
+            console.log('❌ Token expirado o inválido');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
+            sessionStorage.removeItem('role');
+            alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+            window.location.href = 'login.html';
+            return;
+        }
+        if (response.status === 403) {
+            // permiso denegado, no eliminar la sesión
+            console.log('❌ Acceso denegado - sin permisos');
+            alert('No tienes permisos para realizar esta acción.');
+            return response;
+        }
+
+        return response;
+    } catch (error) {
+        console.error('❌ Error en request:', error);
+        throw error;
+    }
+}
+
+async function cargarUsuarios() {
+    try {
+        const response = await fetchConToken('http://172.18.22.4:3000/department/get-departments', {
+            method: 'GET'
+        });
+
+        if (!response) {
+            console.error('⚠️ No se obtuvo respuesta del servidor');
+            return;
+        }
+
+        if (!response.ok) {
+            console.error('⚠️ Error al cargar usuarios, estado:', response.status);
+            // opcional: mostrar mensaje en interfaz
+            return;
+        }
+
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+            console.error('⚠️ Formato de datos inesperado:', data);
+            return;
+        }
+
+        const tabla = document.querySelector('#tabla-body2');
+        tabla.innerHTML = '';
+
+        data.forEach(departamento => {
+            const fila = tabla.insertRow();
+            fila.insertCell().textContent = departamento.id;
+            fila.insertCell().textContent = departamento.nombre;
+            fila.insertCell().textContent = departamento.estado;
+            const btnEditar = document.createElement('button');
+            btnEditar.textContent = 'Editar';
+            btnEditar.className = 'btn btn-secondary btn-sm align-items-center btn-edit';
+            btnEditar.style = 'float: center;';
+            btnEditar.dataset.id = departamento.id;
+            console.log(departamento);
+            // Evitar que usuarios sin rol administrador activen la edición
+            function getRoleFromToken() {
+                const token = sessionStorage.getItem('token');
+                if (!token) return null;
+                try {
+                    const partes = token.split('.');
+                    if (partes.length !== 3) return null;
+                    const payload = JSON.parse(atob(partes[1]));
+                    return payload?.role || null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            btnEditar.onclick = (dataset) => {
+                const role = getRoleFromToken();
+                if (role !== 'admin') {
+                    alert('No tienes permisos para editar este registro');
+                    return;
+                }
+                const id = dataset.target.dataset.id;
+                console.log("📌 Guardando id en sessionStorage:", id);
+                sessionStorage.setItem('id', id);
+                window.location.href = `edit/editar_Departamento.html`;
+            };
+            fila.insertCell().appendChild(btnEditar);
+        });
+
+        // actualizar contador total de registros
+        const totalEl = document.getElementById('totalRegistros');
+        if (totalEl) totalEl.textContent = `Total: ${data.length}`;
+
+        // inicializar/actualizar paginación ahora que la tabla tiene filas
+        if (typeof window.initPagination === 'function') {
+            window.initPagination();
+        }
+    } catch (err) {
+        console.error('❌ Excepción al cargar usuarios:', err);
+    }
+}
+
+function activarExportar() {
+    const btnExportar = document.getElementById("exportar");
+
+    if (!btnExportar) {
+        console.error("⚠️ No se encontró el botón con id 'exportar'");
+        return;
+    }
+
+    btnExportar.addEventListener("click", async () => {
+        console.log("📌 Exportando inventario...");
+        const token = sessionStorage.getItem('token');
+
+        try {
+            const response = await fetch('http://172.18.22.4:3000/api/exportar/departamento', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error en la exportación');
+            }
+
+            // Descargar el archivo
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `departamento_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+        } catch (error) {
+            console.error('❌ Error al exportar:', error);
+            alert('Error al exportar el los usuarios');
+        }
+    });
+}
+document.addEventListener("DOMContentLoaded", activarExportar);
+
+document.addEventListener('DOMContentLoaded', () => {
+    cargarUsuarios();
+});
+
+const menu = document.getElementById("menu");
+const sidebar = document.getElementById("sidebar");
+const main = document.getElementById("main")
+
+menu.addEventListener('click', () => {
+    sidebar.classList.toggle('menu-toggle');
+    menu.classList.toggle('menu-toggle');
+    main.classList.toggle('menu-toggle');
+})
+
+// ✅ CERRAR SESIÓN
+function cerrarSesion() {
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+}
+
+function aplicarFiltro() {
+    const columna = document.getElementById("columnaFiltro").value;
+    const valor = document.getElementById("valorFiltro").value.toLowerCase().trim();
+    const tabla = document.getElementById("tabla");
+    const filas = tabla.getElementsByTagName("tr");
+
+    for (let i = 1; i < filas.length; i++) {
+        const celdas = filas[i].getElementsByTagName("td");
+        if (celdas[columna]) {
+            const texto = celdas[columna].innerText.toLowerCase().trim();
+
+            let mostrar = false;
+
+            // Si la columna es Estado (12) → coincidencia exacta
+            if (columna == 2) {
+                mostrar = (texto === valor);
+            } else {
+                // Para las demás columnas → coincidencia parcial
+                mostrar = texto.includes(valor);
+            }
+
+            filas[i].style.display = mostrar ? "" : "none";
+        }
+    }
+}
+
+function limpiarFiltro() {
+    document.getElementById("valorFiltro").value = "";
+    const tabla = document.getElementById("tabla");
+    const filas = tabla.getElementsByTagName("tr");
+
+    for (let i = 1; i < filas.length; i++) {
+        filas[i].style.display = ""; // muestra todas otra vez
+    }
+}
+
+// Inicializa la paginación; se llama después de cargar los datos en la tabla
+window.initPagination = function () {
+    const tabla = document.querySelector("table tbody"); // cuerpo de la tabla
+    let filas = tabla.querySelectorAll("tr"); // todas las filas actuales
+    const selectRegistros = document.getElementById("registrosPorPagina");
+    const paginacionEl = document.getElementById('paginacion');
+
+    let paginaActual = 1;
+
+    function getRegistrosPorPagina() {
+        const v = parseInt(selectRegistros.value, 10);
+        if (isNaN(v) || v <= 0) return filas.length; // 0 o invalid => mostrar todo
+        return v;
+    }
+
+    function mostrarPagina(pagina) {
+        filas = tabla.querySelectorAll("tr");
+        const total = filas.length;
+        const registrosPorPagina = getRegistrosPorPagina();
+        const inicio = (pagina - 1) * registrosPorPagina;
+        const fin = inicio + registrosPorPagina;
+
+        filas.forEach((fila, index) => {
+            fila.style.display = (index >= inicio && index < fin) ? "" : "none";
+        });
+
+        renderPaginacion(total, registrosPorPagina);
+    }
+
+    function renderPaginacion(totalRegistros, registrosPorPagina) {
+        paginacionEl.innerHTML = '';
+        const totalPaginas = Math.max(1, Math.ceil(totalRegistros / registrosPorPagina));
+
+        function crearLi(text, disabled, active, onClick) {
+            const li = document.createElement('li');
+            li.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.textContent = text;
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!disabled) onClick();
+            });
+            li.appendChild(a);
+            return li;
+        }
+
+        // Prev
+        paginacionEl.appendChild(crearLi('Anterior', paginaActual === 1, false, () => {
+            if (paginaActual > 1) { paginaActual--; mostrarPagina(paginaActual); }
+        }));
+
+        // Páginas numeradas (si son muchas, podríamos truncar, pero por ahora mostramos todas)
+        for (let p = 1; p <= totalPaginas; p++) {
+            paginacionEl.appendChild(crearLi(p, false, p === paginaActual, () => {
+                paginaActual = p; mostrarPagina(paginaActual);
+            }));
+        }
+
+        // Next
+        paginacionEl.appendChild(crearLi('Siguiente', paginaActual === totalPaginas, false, () => {
+            if (paginaActual < totalPaginas) { paginaActual++; mostrarPagina(paginaActual); }
+        }));
+    }
+
+    // cuando cambias la cantidad en el select
+    selectRegistros.addEventListener("change", () => {
+        filas = tabla.querySelectorAll("tr");
+        paginaActual = 1;
+        mostrarPagina(paginaActual);
+    });
+
+    // inicia mostrando la primera página
+    mostrarPagina(paginaActual);
+};
+
+</script>
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+
+    * {
+        font-family: "Nunito Sans", sans-serif;
+        font-size: 1;
+    }
+
     body {
         background-color: #F2F2F2;
         width: 100%;
@@ -108,6 +478,14 @@
         margin-left: 2.6rem;
         margin-right: -1.5rem;
         padding: 0.8rem;
+        padding-top: 70px;
+        transition: margin-left 0.5s ease, margin-right 0.3s ease;
+    }
+
+    footer {
+        margin-left: 2.9rem;
+        margin-right: -1.2rem;
+        padding: 1rem;
         padding-top: 70px;
         transition: margin-left 0.5s ease, margin-right 0.3s ease;
     }
@@ -283,7 +661,7 @@
     }
 
     .sidebar.menu-toggle~main {
-        margin-left: 14rem;
+        margin-left: 15rem;
         margin-right: -1rem;
     }
 

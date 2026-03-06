@@ -168,7 +168,7 @@ function limpiarFormulario() {
 }
 
 function enviarAlBackend(datos) {
-    fetchConToken('http://localhost:3000/api/inventario/implemento', {
+    fetchConToken('http://172.18.22.4:3000/api/inventario/implemento', {
         method: 'POST',
         body: JSON.stringify(datos)
     })
@@ -187,7 +187,7 @@ function enviarAlBackend(datos) {
 function nombre() {
     const name = document.querySelector("#implemento_name");
     const categoria = document.querySelector("#categoria").value;
-    const url = `http://localhost:3000/api/inventario/cat_implemento/${encodeURIComponent(categoria)}`;
+    const url = `http://172.18.22.4:3000/api/inventario/cat_implemento/${encodeURIComponent(categoria)}`;
     name.innerHTML = '<option value="" disabled selected>Seleccione el implemento</option>';
     fetchConToken(url, {
         method: 'GET',
@@ -209,7 +209,7 @@ function nombre() {
 
 function recorrerDepartamentos() {
     const select = document.querySelector("#departamento");
-    const url = 'http://localhost:3000/api/inventario/departamento';
+    const url = 'http://172.18.22.4:3000/department/get-departments';
     fetchConToken(url, {
         method: 'GET',
     })
@@ -229,7 +229,7 @@ function recorrerDepartamentos() {
 
 function recorrerImplementos() {
     const select = document.querySelector("#categoria");
-    const url = 'http://localhost:3000/api/inventario/cat_implemento';
+    const url = 'http://172.18.22.4:3000/api/inventario/cat_implemento';
     fetchConToken(url, {
         method: 'GET',
     })
@@ -250,7 +250,7 @@ function recorrerImplementos() {
 function traerInformacion() {
     return new Promise((resolve, reject) => {
         const id_implemento = sessionStorage.getItem('id_implemento');
-        const url = 'http://localhost:3000/api/inventario/implemento/' + id_implemento;
+        const url = 'http://172.18.22.4:3000/api/inventario/implemento/' + id_implemento;
         fetchConToken(url, {
             method: 'GET',
         })
@@ -269,7 +269,7 @@ function traerInformacion() {
 
 
 function activarEstado() {
-    const url = 'http://localhost:3000/api/inventario/departamento';
+    const url = 'http://172.18.22.4:3000/department/get-departments';
     fetch(url, {
         method: 'GET',
     })

@@ -41,7 +41,7 @@ async function fetchConToken(url, opciones = {}) {
 }
 
 async function cargarImplementos() {
-  const response = await fetchConToken('http://localhost:3000/api/inventario/implemento', {
+  const response = await fetchConToken('http://172.18.22.4:3000/api/inventario/implemento', {
     method: 'GET'
   });
   const data = await response.json();
@@ -131,7 +131,7 @@ function activarExportar() {
     const token = sessionStorage.getItem('token');
 
     try {
-      const response = await fetch('http://localhost:3000/api/exportar/implementos', {
+      const response = await fetch('http://172.18.22.4:3000/api/exportar/implementos', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -176,3 +176,33 @@ function cerrarSesion() {
     sessionStorage.clear();
     window.location.href = 'login.html';
 }
+
+
+function aplicarPermisosSidebar() {
+  function getRoleFromToken() {
+    const token = sessionStorage.getItem('token');
+    if (!token) return null;
+    try {
+      const partes = token.split('.');
+      if (partes.length !== 3) return null;
+      const payload = JSON.parse(atob(partes[1]));
+      return payload?.role || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const role = getRoleFromToken();
+
+  // Oculta links exclusivos de admin si no es admin
+  document.querySelectorAll('[data-admin]').forEach(el => {
+    el.style.display = role === 'admin' ? '' : 'none';
+  });
+
+  // Oculta links exclusivos de gestor si no es gestor
+  document.querySelectorAll('[data-gestor]').forEach(el => {
+    el.style.display = role === 'gestor' ? '' : 'none';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', aplicarPermisosSidebar);

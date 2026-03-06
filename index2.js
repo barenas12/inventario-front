@@ -48,7 +48,7 @@ async function fetchConToken(url, opciones = {}) {
 
 async function cargarUsuarios() {
     try {
-        const response = await fetchConToken('http://localhost:3000/api/login/users', {
+        const response = await fetchConToken('http://172.18.22.4:3000/api/login/users', {
             method: 'GET'
         });
 
@@ -141,7 +141,7 @@ function activarExportar() {
         const token = sessionStorage.getItem('token');
 
         try {
-            const response = await fetch('http://localhost:3000/api/exportar/usuarios', {
+            const response = await fetch('http://172.18.22.4:3000/api/exportar/usuarios', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -189,3 +189,116 @@ function cerrarSesion() {
     sessionStorage.clear();
     window.location.href = 'login.html';
 }
+
+function aplicarFiltro() {
+    const columna = document.getElementById("columnaFiltro").value;
+    const valor = document.getElementById("valorFiltro").value.toLowerCase().trim();
+    const tabla = document.getElementById("tabla");
+    const filas = tabla.getElementsByTagName("tr");
+
+    for (let i = 1; i < filas.length; i++) {
+        const celdas = filas[i].getElementsByTagName("td");
+        if (celdas[columna]) {
+            const texto = celdas[columna].innerText.toLowerCase().trim();
+
+            let mostrar = false;
+
+            // Si la columna es Estado (12) → coincidencia exacta
+            if (columna == 5) {
+                mostrar = (texto === valor);
+            } else {
+                // Para las demás columnas → coincidencia parcial
+                mostrar = texto.includes(valor);
+            }
+
+            filas[i].style.display = mostrar ? "" : "none";
+        }
+    }
+}
+
+function limpiarFiltro() {
+    document.getElementById("valorFiltro").value = "";
+    const tabla = document.getElementById("tabla");
+    const filas = tabla.getElementsByTagName("tr");
+
+    for (let i = 1; i < filas.length; i++) {
+        filas[i].style.display = ""; // muestra todas otra vez
+    }
+}
+
+// Inicializa la paginación; se llama después de cargar los datos en la tabla
+window.initPagination = function () {
+    const tabla = document.querySelector("table tbody"); // cuerpo de la tabla
+    let filas = tabla.querySelectorAll("tr"); // todas las filas actuales
+    const selectRegistros = document.getElementById("registrosPorPagina");
+    const paginacionEl = document.getElementById('paginacion');
+
+    let paginaActual = 1;
+
+    function getRegistrosPorPagina() {
+        const v = parseInt(selectRegistros.value, 10);
+        if (isNaN(v) || v <= 0) return filas.length; // 0 o invalid => mostrar todo
+        return v;
+    }
+
+    function mostrarPagina(pagina) {
+        filas = tabla.querySelectorAll("tr");
+        const total = filas.length;
+        const registrosPorPagina = getRegistrosPorPagina();
+        const inicio = (pagina - 1) * registrosPorPagina;
+        const fin = inicio + registrosPorPagina;
+
+        filas.forEach((fila, index) => {
+            fila.style.display = (index >= inicio && index < fin) ? "" : "none";
+        });
+
+        renderPaginacion(total, registrosPorPagina);
+    }
+
+    function renderPaginacion(totalRegistros, registrosPorPagina) {
+        paginacionEl.innerHTML = '';
+        const totalPaginas = Math.max(1, Math.ceil(totalRegistros / registrosPorPagina));
+
+        function crearLi(text, disabled, active, onClick) {
+            const li = document.createElement('li');
+            li.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.textContent = text;
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!disabled) onClick();
+            });
+            li.appendChild(a);
+            return li;
+        }
+
+        // Prev
+        paginacionEl.appendChild(crearLi('Anterior', paginaActual === 1, false, () => {
+            if (paginaActual > 1) { paginaActual--; mostrarPagina(paginaActual); }
+        }));
+
+        // Páginas numeradas (si son muchas, podríamos truncar, pero por ahora mostramos todas)
+        for (let p = 1; p <= totalPaginas; p++) {
+            paginacionEl.appendChild(crearLi(p, false, p === paginaActual, () => {
+                paginaActual = p; mostrarPagina(paginaActual);
+            }));
+        }
+
+        // Next
+        paginacionEl.appendChild(crearLi('Siguiente', paginaActual === totalPaginas, false, () => {
+            if (paginaActual < totalPaginas) { paginaActual++; mostrarPagina(paginaActual); }
+        }));
+    }
+
+    // cuando cambias la cantidad en el select
+    selectRegistros.addEventListener("change", () => {
+        filas = tabla.querySelectorAll("tr");
+        paginaActual = 1;
+        mostrarPagina(paginaActual);
+    });
+
+    // inicia mostrando la primera página
+    mostrarPagina(paginaActual);
+};

@@ -218,7 +218,7 @@ function limpiarFormulario() {
 }
 
 function enviarAlBackend(datos) {
-    fetchConToken('http://localhost:3000/api/inventario/implemento', {
+    fetchConToken('http://172.18.22.4:3000/api/inventario/implemento', {
         method: 'POST',
         body: JSON.stringify(datos)
     })
@@ -232,51 +232,29 @@ function enviarAlBackend(datos) {
         });
 }
 
-function nombre() {
-    const name = document.querySelector("#implemento_name");
-    const categoria = document.querySelector("#categoria").value;
-    const url = `http://localhost:3000/api/inventario/cat_implemento/${encodeURIComponent(categoria)}`;
-    name.innerHTML = '<option value="" disabled selected>Seleccione el implemento</option>';
-    fetchConToken(url, {
-        method: 'GET',
-    })
-        .then(res => res.json())
-        .then(lista_cat => {
-            for (let implemento of lista_cat) {
-                let nuevaOpcion = document.createElement("option");
-                nuevaOpcion.value = implemento.nom_implemento;
-                nuevaOpcion.text = implemento.nom_implemento;
-                name.add(nuevaOpcion);
-            }
-        })
-        .catch(function (error) {
-            console.error("¡Error!", error);
-        });
-}
-
 function recorrerDepartamentos() {
     const select = document.querySelector("#departamento");
-    const url = 'http://localhost:3000/api/inventario/departamento';
-    fetchConToken(url, {
-        method: 'GET',
-    })
+    const url = 'http://172.18.22.4:3000/department/get-departments';
+    
+    fetchConToken(url, { method: 'GET' })
         .then(res => res.json())
         .then(lista_de_departamentos => {
-            for (let departamento of lista_de_departamentos) {
+            // ✅ Filtra solo los activos antes de recorrer
+            const activos = lista_de_departamentos.filter(d => d.estado === 'Activo');
+            
+            for (let departamento of activos) {
                 let nuevaOpcion = document.createElement("option");
                 nuevaOpcion.value = departamento.id;
                 nuevaOpcion.text = departamento.nombre;
                 select.add(nuevaOpcion);
             }
         })
-        .catch(function (error) {
-            console.error("¡Error!", error);
-        });
+        .catch(error => console.error("¡Error!", error));
 }
 
 function recorrerResponsable() {
     const select = document.querySelector("#responsable");
-    const url = 'http://localhost:3000/api/inventario/responsable';
+    const url = 'http://172.18.22.4:3000/api/inventario/responsable';
     select.innerHTML = '<option value="" disabled selected>Seleccione el responsable</option>';
     fetchConToken(url, {
         method: 'GET',
@@ -297,13 +275,14 @@ function recorrerResponsable() {
 
 function recorrerImplementos() {
     const select = document.querySelector("#categoria");
-    const url = 'http://localhost:3000/api/inventario/cat_implemento';
+    const url = 'http://172.18.22.4:3000/api/inventario/cat_implemento';
     fetchConToken(url, {
         method: 'GET',
     })
         .then(res => res.json())
         .then(lista_cat => {
-            for (let implemento of lista_cat) {
+            const activos = lista_cat.filter(d => d.estado === 'Activo');
+            for (let implemento of activos) {
                 let nuevaOpcion = document.createElement("option");
                 nuevaOpcion.value = implemento.id;
                 nuevaOpcion.text = implemento.nombre;
@@ -314,9 +293,81 @@ function recorrerImplementos() {
             console.error("¡Error!", error);
         })
 }
+function nombre() {
+    const name = document.querySelector("#implemento_name");
+    const categoria = document.querySelector("#categoria").value;
+    const url = `http://172.18.22.4:3000/api/inventario/cat_implemento/${encodeURIComponent(categoria)}`;
+    name.innerHTML = '<option value="" disabled selected>Seleccione el implemento</option>';
+    fetchConToken(url, {
+        method: 'GET',
+    })
+        .then(res => res.json())
+        .then(lista_cat => {
+            for (let implemento of lista_cat) {
+                let nuevaOpcion = document.createElement("option");
+                nuevaOpcion.value = implemento.nom_implemento;
+                nuevaOpcion.text = implemento.nom_implemento;
+                name.add(nuevaOpcion);
+            }
+        })
+        .catch(function (error) {
+            console.error("¡Error!", error);
+        });
+}
+
+function Propietario() {
+    const propietario = document.querySelector("#propietario");
+    const pertenencia = document.querySelector("#pertenencia").value;
+    const url = `http://172.18.22.4:3000/api/inventario/propietario/${encodeURIComponent(pertenencia)}`;
+    propietario.innerHTML = '<option value="" disabled selected>Seleccione el propietario</option>';
+    fetchConToken(url, {
+        method: 'GET',
+    })
+        .then(res => res.json())
+        .then(lista_cat => {
+            for (let propietarios of lista_cat) {
+                let nuevaOpcion = document.createElement("option");
+                nuevaOpcion.value = propietarios.id;
+                nuevaOpcion.text = propietarios.nombre_proveedor;
+                propietario.add(nuevaOpcion);
+            }
+        })
+        .catch(function (error) {
+            console.error("¡Error!", error);
+        });
+}
 
 // ✅ CERRAR SESIÓN
 function cerrarSesion() {
     sessionStorage.clear();
     window.location.href = 'login.html';
 }
+
+function aplicarPermisosSidebar() {
+  function getRoleFromToken() {
+    const token = sessionStorage.getItem('token');
+    if (!token) return null;
+    try {
+      const partes = token.split('.');
+      if (partes.length !== 3) return null;
+      const payload = JSON.parse(atob(partes[1]));
+      return payload?.role || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const role = getRoleFromToken();
+
+  // Oculta links exclusivos de admin si no es admin
+  document.querySelectorAll('[data-admin]').forEach(el => {
+    el.style.display = role === 'admin' ? '' : 'none';
+  });
+
+  // Oculta links exclusivos de gestor si no es gestor
+  document.querySelectorAll('[data-gestor]').forEach(el => {
+    el.style.display = role === 'gestor' ? '' : 'none';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', aplicarPermisosSidebar);
